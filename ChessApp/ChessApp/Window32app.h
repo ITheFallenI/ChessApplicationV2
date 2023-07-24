@@ -1,10 +1,7 @@
 #pragma once
 
-#include <iostream>
-#include "Windows.h"
-#include <io.h>
-#include <fcntl.h>
-#include <d2d1.h>
+#include "HeaderCollection.h"
+#include "ChessBoard.h"
 
 class Window32app
 {
@@ -12,7 +9,13 @@ public:
 	int Run(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow);
 	static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 private:
-	const D2D1_POINT_2F defaultWinSize = { 1280, 720 };
-	const D2D1_POINT_2F minWinSize = { 1280, 720 };
+	static ID2D1Factory* d2dFactory; // Add this member for Direct2D factory
+	static ID2D1HwndRenderTarget* renderTarget; // Add this member for the render target
+
+	static D2D1_POINT_2F defaultWinSize;
+	static D2D1_POINT_2F minWinSize;
+	static HRESULT DirectXsetup(HWND hwnd);
+	static void RenderBoard();
+	static void LeftClickFunction(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
