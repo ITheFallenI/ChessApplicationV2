@@ -1,0 +1,10 @@
+﻿  ChessApp.cpp
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessApp.cpp(29,36): warning C4311: 'type cast': pointer truncation from 'HANDLE' to 'long'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessApp.cpp(29,36): warning C4302: 'type cast': truncation from 'HANDLE' to 'long'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessApp.cpp(35,32): warning C4311: 'type cast': pointer truncation from 'HANDLE' to 'long'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessApp.cpp(35,32): warning C4302: 'type cast': truncation from 'HANDLE' to 'long'
+  Window32app.cpp
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(25,71): warning C4244: 'argument': conversion from 'const FLOAT' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(25,53): warning C4244: 'argument': conversion from 'const FLOAT' to 'int', possible loss of data
+  Generating Code...
+  ChessApp.vcxproj -> F:\repos\Chess\ChessApplicationV2\ChessApp\x64\Debug\ChessApp.exe
