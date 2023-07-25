@@ -74,4 +74,16 @@ ChessBoard::ChessBoard()
 ChessBoard::~ChessBoard()
 {
 
+	OutputDebugStringW(L"Chess Board destructor.\n");
+}
+
+bool ChessBoard::IsPointInsidePolygon(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3) {
+	// Perform point-in-polygon test using cross product
+	float crossProduct1 = (x1 - x0) * (y - y0) - (x - x0) * (y1 - y0);
+	float crossProduct2 = (x2 - x1) * (y - y1) - (x - x1) * (y2 - y1);
+	float crossProduct3 = (x3 - x2) * (y - y2) - (x - x2) * (y3 - y2);
+	float crossProduct4 = (x0 - x3) * (y - y3) - (x - x3) * (y0 - y3);
+
+	return (crossProduct1 >= 0 && crossProduct2 >= 0 && crossProduct3 >= 0 && crossProduct4 >= 0) ||
+		(crossProduct1 <= 0 && crossProduct2 <= 0 && crossProduct3 <= 0 && crossProduct4 <= 0);
 }

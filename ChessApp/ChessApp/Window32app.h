@@ -17,5 +17,6 @@ private:
 	static HRESULT DirectXsetup(HWND hwnd);
 	static void RenderBoard();
 	static void LeftClickFunction(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static void CleanUp();
 };
 

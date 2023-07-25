@@ -9,6 +9,9 @@ D2D1_POINT_2F Window32app::minWinSize = { 1280, 720 };
 
 ChessBoard chessBoard;
 
+int selectedtileX = 0;
+int selectedtileY = 0;
+
 int Window32app::Run(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
     OutputDebugStringW(L"Init run. Creating Window...\n");
@@ -121,7 +124,7 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
     case WM_DESTROY:
     {
-        //win32app.CleanUp();
+        CleanUp();
         PostQuitMessage(0);
         return 0;
     }
@@ -151,7 +154,7 @@ void Window32app::RenderBoard()
         int chessboardSize = minDimension - (2 * padding);
 
         // Calculate the size of each tile based on the available space and padding
-        float tileSize = static_cast<float>(chessboardSize) / static_cast<float>(max(rows, cols));
+        float tileSize = static_cast<float>(chessboardSize) / static_cast<float>(max(rows, cols));// / 1.25f
 
         // Calculate the total size of the chessboard including padding
         float chessboardWidth = tileSize * cols + (2 * padding);
@@ -185,7 +188,7 @@ void Window32app::RenderBoard()
 
                 renderTarget->FillRectangle(D2D1::RectF(x, y, x + tileSize, y + tileSize), tile.pBrush);
 
-                if (tile.x == chessBoard.board[7][7].x && tile.y == chessBoard.board[7][7].y) {
+                if (tile.x == chessBoard.board[selectedtileY][selectedtileX].x && tile.y == chessBoard.board[selectedtileY][selectedtileX].y) {
 
                     // Create a solid color brush for the dots
                     ID2D1SolidColorBrush* dotBrush = nullptr;
@@ -246,7 +249,6 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
 
     OutputDebugStringW(L"Direct X context created.\n");
 
-
     OutputDebugStringW(L"Creating Brushes for each tile.\n");
 
     for (int row = 0; row < chessBoard.GetRows(); row++)
@@ -268,12 +270,38 @@ void Window32app::LeftClickFunction(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM 
     const std::wstring rawMouseCoords = L"Mouse X: " + std::to_wstring(mouseX) + L", Mouse y:" + std::to_wstring(mouseY) + L"\n";
     OutputDebugStringW(rawMouseCoords.c_str());
 
-    // Calculate the position of the click relative to the chessboard 
-    D2D1_SIZE_F renderTargetSize = renderTarget->GetSize();
+    for (int row = 0; row < chessBoard.GetRows(); row++)
+    {
+        for (int col = 0; col < chessBoard.GetColumns(); col++)
+        {
+            auto& tile = chessBoard.board[col][row];
+            if (chessBoard.IsPointInsidePolygon(mouseX, mouseY, tile.polygon.x0, tile.polygon.y0, tile.polygon.x1, tile.polygon.y1, tile.polygon.x2, tile.polygon.y2, tile.polygon.x3, tile.polygon.y3)) {
+                selectedtileX = tile.x;
+                selectedtileY = tile.y;
+                const std::wstring clickedTileDATA = L"Clicked tile: X: " + std::to_wstring(tile.x) + L",  Y:" + std::to_wstring(tile.y) + L"\n";
+                OutputDebugStringW(clickedTileDATA.c_str());
+                break;
+            }
+        }
+    }
 
 
-    // Convert screen coordinates to chess coordinates
-    OutputDebugStringW(L"");
+}
 
+void Window32app::CleanUp()
+{
+    for (int row = 0; row < chessBoard.GetRows(); row++)
+    {
+        for (int col = 0; col < chessBoard.GetColumns(); col++)
+        {
+            auto& tile = chessBoard.board[col][row];
 
+            if (tile.pBrush != nullptr) {
+                tile.pBrush->Release();
+                tile.pBrush = nullptr;
+            }
+        }
+    }
+
+    OutputDebugStringW(L"Cleanup all brushes.\n");
 }

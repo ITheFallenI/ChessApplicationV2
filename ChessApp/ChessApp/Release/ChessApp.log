@@ -1,0 +1,20 @@
+﻿  ChessApp.cpp
+  ChessBoard.cpp
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessBoard.cpp(57,72): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessBoard.cpp(57,67): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessBoard.cpp(58,30): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessBoard.cpp(58,24): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\ChessBoard.cpp(58,18): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+  Window32app.cpp
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(24,17): warning C4244: 'initializing': conversion from 'FLOAT' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(25,17): warning C4244: 'initializing': conversion from 'FLOAT' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(42,85): warning C4244: 'argument': conversion from 'FLOAT' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(42,54): warning C4244: 'argument': conversion from 'FLOAT' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(89,64): warning C4244: '=': conversion from 'FLOAT' to 'LONG', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(90,64): warning C4244: '=': conversion from 'FLOAT' to 'LONG', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(166,67): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(166,61): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(166,55): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Microsoft\VC\v170\Microsoft.CppCommon.targets(1127,5): error MSB6006: "link.exe" exited with code 1120.
+MSVCRT.lib(exe_main.obj) : error LNK2001: unresolved external symbol _main
+F:\repos\Chess\ChessApplicationV2\ChessApp\Release\ChessApp.exe : fatal error LNK1120: 1 unresolved externals
