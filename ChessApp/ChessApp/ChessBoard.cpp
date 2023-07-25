@@ -50,50 +50,28 @@ ChessBoard::ChessBoard()
 	OutputDebugStringW(L"Init ChessBoard, Generating tiles.\n");
 
 	//Generate 64 Chess tiles.
-	for (size_t y = 0; y < rows; y++)
+	for (int row = 0; row < GetRows(); row++)
 	{
-		for (size_t x = 0; x < cols; x++)
+		for (int col = 0; col < GetColumns(); col++)
 		{
-			D2D1_COLOR_F genColor = (x + y) % 2 == 0 ? D2D1::ColorF(1, 0.8, 0.61, 1) : 
+			D2D1_COLOR_F genColor = (col + row) % 2 == 0 ? D2D1::ColorF(1, 0.8, 0.61, 1) :
 				D2D1::ColorF(0.81, 0.54, 0.275, 1);
 
-			ChessTile tile;
-			tile.x = x;
-			tile.y = y;
-			tile.pBrush = nullptr;
-			tile.type = TileType::NONE;
-			tile.team = TileTeam::NONE;
-			tile.defaultColor = genColor;
-			tile.currentColor = genColor;
-			tiles.push_back(tile);
+
+			// Set values for each ChessTile in the board
+			board[row][col].x = col;
+			board[row][col].y = row;
+			board[row][col].pBrush = nullptr;
+			board[row][col].type = TileType::NONE;
+			board[row][col].team = TileTeam::NONE;
+			board[row][col].defaultColor = genColor;
+			board[row][col].currentColor = genColor;
+
 		}
-	}
-
-	//log created tiles?
-	bool logTiles = true;
-
-	if (logTiles) {
-		for (size_t i = 0; i < tiles.size(); i++)
-		{
-			//std::cout << "Tile " << i << ": Type: " << tiles[i].type << " Team Color: " << tiles[i].team << std::endl;
-		}
-
-		std::wstring mesg = L"Generated: (" + std::to_wstring(tiles.size()) + L") tiles.\n";
-		OutputDebugStringW(mesg.c_str());
 	}
 }
 
 ChessBoard::~ChessBoard()
 {
 
-}
-
-int ChessBoard::GetRows()
-{
-	return rows;
-}
-
-int ChessBoard::GetColumns()
-{
-	return cols;
 }

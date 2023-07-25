@@ -50,12 +50,10 @@ class ChessBoard
 public:
     ChessBoard();
     ~ChessBoard();
-    std::vector<ChessTile> tiles;
-    int GetRows();
-    int GetColumns();
 
-private:
-    const int rows = 8;
-    const int cols = 8;
+    ChessTile board[8][8]; // 2D array of ChessTile objects
+
+    int GetRows() const { return 8; }
+    int GetColumns() const { return 8; }
 };
 
