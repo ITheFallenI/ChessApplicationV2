@@ -165,56 +165,62 @@ void Window32app::RenderBoard()
         renderTarget->BeginDraw();
         renderTarget->Clear(D2D1::ColorF(D2D1::ColorF(0.15, 0.15, 0.15, 1)));
 
-        // Loop through each tile and draw it on the render target with padding
-        for (auto& tile : chessBoard.tiles)
+
+        for (int row = 0; row < chessBoard.GetRows(); row++)
         {
-            // Calculate the position to draw the tile with padding
-            float x = chessboardX + padding + tile.x * tileSize;
-            float y = chessboardY + padding + tile.y * tileSize;
-
-            tile.polygon = TilePolygon{
-                x, y,                  // Top-left
-                x + tileSize, y,       // Top-right
-                x + tileSize, y + tileSize, // Bottom-right
-                x, y + tileSize        // Bottom-left
-            };
-
-            renderTarget->FillRectangle(D2D1::RectF(x, y, x + tileSize, y + tileSize), tile.pBrush);
-
-
-            // Create a solid color brush for the dots
-            ID2D1SolidColorBrush* dotBrush = nullptr;
-            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0, 1.0f, 0), &dotBrush);
-            if (FAILED(hr))
+            for (int col = 0; col < chessBoard.GetColumns(); col++)
             {
-                // Handle the error if necessary
+                auto& tile = chessBoard.board[col][row];
+
+                float x = chessboardX + padding + tile.x * tileSize;
+                float y = chessboardY + padding + tile.y * tileSize;
+
+                tile.polygon = TilePolygon{
+                    x, y,                  // Top-left
+                    x + tileSize, y,       // Top-right
+                    x + tileSize, y + tileSize, // Bottom-right
+                    x, y + tileSize        // Bottom-left
+                };
+
+
+                renderTarget->FillRectangle(D2D1::RectF(x, y, x + tileSize, y + tileSize), tile.pBrush);
+
+                if (tile.x == chessBoard.board[7][7].x && tile.y == chessBoard.board[7][7].y) {
+
+                    // Create a solid color brush for the dots
+                    ID2D1SolidColorBrush* dotBrush = nullptr;
+                    HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0, 1.0f, 0), &dotBrush);
+                    if (FAILED(hr))
+                    {
+                        // Handle the error if necessary
+                    }
+
+                    // Draw four dots for each point of the tile polygon
+                    D2D1_ELLIPSE dotEllipse;
+                    float dotRadius = 4.0f; // Adjust the dot radius as needed
+
+                    // Draw dot for point (x0, y0)
+                    dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
+                    dotEllipse.radiusX = dotEllipse.radiusY = dotRadius;
+                    renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+                    // Draw dot for point (x1, y1)
+                    dotEllipse.point = D2D1::Point2F(tile.polygon.x1, tile.polygon.y1);
+                    renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+                    // Draw dot for point (x2, y2)
+                    dotEllipse.point = D2D1::Point2F(tile.polygon.x2, tile.polygon.y2);
+                    renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+                    // Draw dot for point (x3, y3)
+                    dotEllipse.point = D2D1::Point2F(tile.polygon.x3, tile.polygon.y3);
+                    renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+                    // Release the dot brush after use
+                    dotBrush->Release();
+                    dotBrush = nullptr;
+                }
             }
-
-            // Draw four dots for each point of the tile polygon
-            D2D1_ELLIPSE dotEllipse;
-            float dotRadius = 4.0f; // Adjust the dot radius as needed
-
-            // Draw dot for point (x0, y0)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
-            dotEllipse.radiusX = dotEllipse.radiusY = dotRadius;
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x1, y1)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x1, tile.polygon.y1);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x2, y2)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x2, tile.polygon.y2);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x3, y3)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x3, tile.polygon.y3);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Release the dot brush after use
-            dotBrush->Release();
-            dotBrush = nullptr;
-
         }
 
         // End drawing
@@ -242,11 +248,13 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
 
 
     OutputDebugStringW(L"Creating Brushes for each tile.\n");
-    // Create brushes for each tile based on the color stored in the ChessBoardTile struct
-    for (size_t i = 0; i < chessBoard.tiles.size(); i++) {
-        HRESULT hr = renderTarget->CreateSolidColorBrush(chessBoard.tiles[i].currentColor, &chessBoard.tiles[i].pBrush);
-        if (FAILED(hr)) {
-            // std::cout << "error creating BRUSH!!" << std::endl;
+
+    for (int row = 0; row < chessBoard.GetRows(); row++)
+    {
+        for (int col = 0; col < chessBoard.GetColumns(); col++)
+        {
+            auto& tile = chessBoard.board[col][row];
+            HRESULT hr = renderTarget->CreateSolidColorBrush(tile.currentColor, &tile.pBrush);
         }
     }
 
