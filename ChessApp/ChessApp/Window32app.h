@@ -18,5 +18,7 @@ private:
 	static void RenderBoard();
 	static void LeftClickFunction(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void CleanUp();
+
+	static void DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitmap, int x, int y, float width, float height);
 };
 

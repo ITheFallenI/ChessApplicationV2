@@ -32,17 +32,27 @@ std::ostream& operator<<(std::ostream& os, const TileType& TileType);
 struct ChessTile
 {
     TilePolygon polygon;
-    TileType type;
-    TileTeam team;
-    ID2D1Bitmap* bitmap = nullptr;
     D2D1_COLOR_F defaultColor;
     D2D1_COLOR_F currentColor;
     ID2D1SolidColorBrush* pBrush = nullptr;
 
     int x = -1;
     int y = -1;
-
+    int tileSize = 0;
     ChessTile() = default;
+};
+
+struct ChessPiece {
+    TileTeam team;
+    TileType type;
+    ID2D1Bitmap* bitmap = nullptr;
+
+    int x = 0;
+    int y = 0;
+    int tileSize = 60;
+
+
+    ChessPiece() = default;
 };
 
 class ChessBoard
@@ -56,5 +66,14 @@ public:
     int GetRows() const { return 8; }
     int GetColumns() const { return 8; }
     bool IsPointInsidePolygon(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3);
+
+    static HRESULT LoadChessPieceTexture(ID2D1RenderTarget* pRenderTarget, const wchar_t* filePath, ID2D1Bitmap** ppBitmap);
+
+    static ID2D1Bitmap* pPawnBitmap_w;
+    static ID2D1Bitmap* pPawnBitmap_b;
 };
 
+class BoardPieces {
+public:
+    ChessPiece pieces[8][8]; // 2D array of ChessTile objects
+};
