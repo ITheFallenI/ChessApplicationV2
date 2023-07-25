@@ -1,6 +1,9 @@
 #include "ChessBoard.h"
 
 
+ID2D1Bitmap* ChessBoard::pPawnBitmap_w = nullptr;
+ID2D1Bitmap* ChessBoard::pPawnBitmap_b = nullptr;
+
 // Overload the << operator for PieceType enum
 std::ostream& operator<<(std::ostream& os, const TileType& pieceType)
 {
@@ -62,8 +65,6 @@ ChessBoard::ChessBoard()
 			board[row][col].x = col;
 			board[row][col].y = row;
 			board[row][col].pBrush = nullptr;
-			board[row][col].type = TileType::NONE;
-			board[row][col].team = TileTeam::NONE;
 			board[row][col].defaultColor = genColor;
 			board[row][col].currentColor = genColor;
 
@@ -87,3 +88,110 @@ bool ChessBoard::IsPointInsidePolygon(float x, float y, float x0, float y0, floa
 	return (crossProduct1 >= 0 && crossProduct2 >= 0 && crossProduct3 >= 0 && crossProduct4 >= 0) ||
 		(crossProduct1 <= 0 && crossProduct2 <= 0 && crossProduct3 <= 0 && crossProduct4 <= 0);
 }
+
+
+HRESULT ChessBoard::LoadChessPieceTexture(ID2D1RenderTarget* pRenderTarget, const wchar_t* filePath, ID2D1Bitmap** ppBitmap)
+{
+    ID2D1Bitmap* pBitmap = nullptr;
+    IWICImagingFactory* pWICFactory = nullptr;
+    IWICBitmapDecoder* pDecoder = nullptr;
+    IWICBitmapFrameDecode* pFrame = nullptr;
+    IWICFormatConverter* pConverter = nullptr;
+
+    HRESULT hr = CoCreateInstance(
+        CLSID_WICImagingFactory,
+        nullptr,
+        CLSCTX_INPROC_SERVER,
+        IID_PPV_ARGS(&pWICFactory)
+    );
+
+    if (FAILED(hr))
+    {
+        // Handle the error if WIC factory creation fails.
+        OutputDebugString(L"Failed to create WIC imaging factory.\n");
+        return hr;
+    }
+
+    hr = pWICFactory->CreateDecoderFromFilename(
+        filePath,
+        nullptr,
+        GENERIC_READ,
+        WICDecodeMetadataCacheOnLoad,
+        &pDecoder
+    );
+
+    if (FAILED(hr))
+    {
+        // Handle the error if image decoding fails.
+        OutputDebugString(L"Failed to decode image file.\n");
+        pWICFactory->Release();
+        return hr;
+    }
+
+    hr = pDecoder->GetFrame(0, &pFrame);
+
+    if (FAILED(hr) || !pFrame)
+    {
+        // Handle the error if frame retrieval fails or pFrame is null.
+        OutputDebugString(L"Failed to get image frame or pFrame is null.\n");
+        pDecoder->Release();
+        pWICFactory->Release();
+        return hr;
+    }
+
+    hr = pWICFactory->CreateFormatConverter(&pConverter);
+
+    if (FAILED(hr))
+    {
+        // Handle the error if format conversion fails.
+        OutputDebugString(L"Failed to create WIC format converter.\n");
+        pFrame->Release();
+        pDecoder->Release();
+        pWICFactory->Release();
+        return hr;
+    }
+
+    hr = pConverter->Initialize(
+        pFrame,
+        GUID_WICPixelFormat32bppPBGRA,
+        WICBitmapDitherTypeNone,
+        nullptr,
+        0.0f,
+        WICBitmapPaletteTypeMedianCut
+    );
+
+    if (FAILED(hr))
+    {
+        // Handle the error if format conversion initialization fails.
+        OutputDebugString(L"Failed to initialize WIC format converter.\n");
+        pConverter->Release();
+        pFrame->Release();
+        pDecoder->Release();
+        pWICFactory->Release();
+        return hr;
+    }
+
+    hr = pRenderTarget->CreateBitmapFromWicBitmap(pConverter, nullptr, &pBitmap);
+
+    if (FAILED(hr))
+    {
+        // Handle the error if creating Direct2D bitmap from WIC bitmap fails.
+        OutputDebugString(L"Failed to create Direct2D bitmap from WIC bitmap.\n");
+        pConverter->Release();
+        pFrame->Release();
+        pDecoder->Release();
+        pWICFactory->Release();
+        return hr;
+    }
+
+    // Release resources used for loading the image
+    pConverter->Release();
+    pFrame->Release();
+    pDecoder->Release();
+    pWICFactory->Release();
+
+    *ppBitmap = pBitmap;
+
+    return hr;
+}
+
