@@ -11,8 +11,8 @@ ChessBoard board;
 ChessPiece* draggablePiece = nullptr;
 bool dragging = false;
 
-int selectedtileX = 0;
-int selectedtileY = 0;
+int selectedtileX = -1;
+int selectedtileY = -1;
 
 int Window32app::Run(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -95,16 +95,8 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         return 0;
     }
     case WM_LBUTTONUP: {
-
         LeftMouseUp(hwnd, uMsg, wParam, lParam);
-
-        if (dragging && draggablePiece) {
-            draggablePiece->x = selectedtileY;
-            draggablePiece->y = selectedtileX;
-            board.tile[selectedtileX][selectedtileY].piece = draggablePiece;
-            draggablePiece = nullptr;
-            dragging = false;
-        }
+        InvalidateRect(hwnd, NULL, FALSE);
         return 0;
     }
     case WM_PAINT:
@@ -311,6 +303,36 @@ void Window32app::LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
 
     const std::wstring rawMouseCoords = L"Mouse Up: Mouse X: " + std::to_wstring(mouseX) + L", Mouse y:" + std::to_wstring(mouseY) + L"\n";
     OutputDebugStringW(rawMouseCoords.c_str());
+
+    for (int row = board.GetRows() - 1; row >= 0; row--)
+    {
+        for (int col = 0; col < board.GetColumns(); col++)
+        {
+            auto& tile = board.tile[col][row];
+            if (board.IsPointInsidePolygon(mouseX, mouseY, tile.polygon.x0, tile.polygon.y0, tile.polygon.x1, tile.polygon.y1, tile.polygon.x2, tile.polygon.y2, tile.polygon.x3, tile.polygon.y3)) 
+            {
+                //if slot is valid move check to go here
+                if (dragging && draggablePiece) {
+                    draggablePiece->x = tile.y;
+                    draggablePiece->y = tile.x;
+                    selectedtileX = tile.x;
+                    selectedtileY = tile.y;
+                    tile.piece = draggablePiece;
+                    draggablePiece = nullptr;
+                    dragging = false;
+                    break;
+                }
+            }
+        }
+    }
+
+    if (dragging && draggablePiece) {
+        draggablePiece->x = selectedtileY;
+        draggablePiece->y = selectedtileX;
+        board.tile[selectedtileX][selectedtileY].piece = draggablePiece;
+        draggablePiece = nullptr;
+        dragging = false;
+    }
 }
 
 
