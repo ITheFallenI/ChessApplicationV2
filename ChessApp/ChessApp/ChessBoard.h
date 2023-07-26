@@ -29,19 +29,6 @@ enum class TileType {
 
 std::ostream& operator<<(std::ostream& os, const TileType& TileType);
 
-struct ChessTile
-{
-    TilePolygon polygon;
-    D2D1_COLOR_F defaultColor;
-    D2D1_COLOR_F currentColor;
-    ID2D1SolidColorBrush* pBrush = nullptr;
-
-    int x = -1;
-    int y = -1;
-    int tileSize = 0;
-    ChessTile() = default;
-};
-
 struct ChessPiece {
     TileTeam team;
     TileType type;
@@ -55,13 +42,30 @@ struct ChessPiece {
     ChessPiece() = default;
 };
 
+struct ChessTile
+{
+    TilePolygon polygon;
+    D2D1_COLOR_F defaultColor;
+    D2D1_COLOR_F currentColor;
+    ID2D1SolidColorBrush* pBrush = nullptr;
+
+    int x = -1;
+    int y = -1;
+    int padding = 0;
+    int tileSize = 0;
+    ChessPiece* piece = nullptr;
+    ChessTile() = default;
+};
+
+
+
 class ChessBoard
 {
 public:
     ChessBoard();
     ~ChessBoard();
 
-    ChessTile board[8][8]; // 2D array of ChessTile objects
+    ChessTile tile[8][8]; // 2D array of ChessTile objects
 
     int GetRows() const { return 8; }
     int GetColumns() const { return 8; }
@@ -71,9 +75,4 @@ public:
 
     static ID2D1Bitmap* pPawnBitmap_w;
     static ID2D1Bitmap* pPawnBitmap_b;
-};
-
-class BoardPieces {
-public:
-    ChessPiece pieces[8][8]; // 2D array of ChessTile objects
 };

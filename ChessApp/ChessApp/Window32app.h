@@ -16,7 +16,7 @@ private:
 	static D2D1_POINT_2F minWinSize;
 	static HRESULT DirectXsetup(HWND hwnd);
 	static void RenderBoard();
-	static void LeftClickFunction(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static void LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void CleanUp();
 
 	static void DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitmap, int x, int y, float width, float height);

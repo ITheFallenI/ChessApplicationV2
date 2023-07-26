@@ -53,7 +53,7 @@ ChessBoard::ChessBoard()
 	OutputDebugStringW(L"Init ChessBoard, Generating tiles.\n");
 
 	//Generate 64 Chess tiles.
-	for (int row = 0; row < GetRows(); row++)
+	for (int row = GetRows() - 1; row >= 0; row--)
 	{
 		for (int col = 0; col < GetColumns(); col++)
 		{
@@ -62,11 +62,11 @@ ChessBoard::ChessBoard()
 
 
 			// Set values for each ChessTile in the board
-			board[row][col].x = col;
-			board[row][col].y = row;
-			board[row][col].pBrush = nullptr;
-			board[row][col].defaultColor = genColor;
-			board[row][col].currentColor = genColor;
+            tile[col][row].x = col;
+            tile[col][row].y = row;
+            tile[col][row].pBrush = nullptr;
+            tile[col][row].defaultColor = genColor;
+            tile[col][row].currentColor = genColor;
 
 		}
 	}
