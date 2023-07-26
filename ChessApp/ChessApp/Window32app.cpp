@@ -6,9 +6,10 @@ ID2D1HwndRenderTarget* Window32app::renderTarget = nullptr;
 
 D2D1_POINT_2F Window32app::defaultWinSize = { 1280, 720 };
 D2D1_POINT_2F Window32app::minWinSize = { 1280, 720 };
+ChessBoard board;
 
-ChessBoard chessBoard;
-BoardPieces boardPieces;
+ChessPiece* draggablePiece = nullptr;
+bool dragging = false;
 
 int selectedtileX = 0;
 int selectedtileY = 0;
@@ -34,13 +35,13 @@ int Window32app::Run(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
     WNDCLASS wc = {};
     wc.lpfnWndProc = WindowProc;
     wc.hInstance = hInstance;
-    wc.lpszClassName = L"ChessBoardWindowClass";
+    wc.lpszClassName = L"boardWindowClass";
     wc.hCursor = LoadCursor(NULL, IDC_ARROW);
     RegisterClass(&wc);
 
     hwnd = CreateWindowEx(
         0,
-        L"ChessBoardWindowClass",
+        L"boardWindowClass",
         L"DirectX Chess Board",
         WS_OVERLAPPEDWINDOW,
         windowX, windowY, Window32app::defaultWinSize.x, Window32app::defaultWinSize.y,
@@ -81,6 +82,29 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     {
         return 0;
     }
+    case WM_MOUSEMOVE: {
+        if (dragging) {
+            if (draggablePiece != nullptr) {
+                OutputDebugStringW(L"draggable piece! here.\n");
+
+                draggablePiece->x = static_cast<float>(LOWORD(lParam));
+                draggablePiece->y = static_cast<float>(HIWORD(lParam));
+            }
+            InvalidateRect(hwnd, NULL, FALSE);
+        }
+
+        return 0;
+    }
+    case WM_LBUTTONUP: {
+        if (dragging && draggablePiece) {
+            draggablePiece->x = selectedtileY;
+            draggablePiece->y = selectedtileX;
+            board.tile[selectedtileX][selectedtileY].piece = draggablePiece;
+            draggablePiece = nullptr;
+            dragging = false;
+        }
+        return 0;
+    }
     case WM_PAINT:
     {
         Window32app::RenderBoard();
@@ -112,7 +136,7 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
     case WM_LBUTTONDOWN:
     {
-        LeftClickFunction(hwnd, uMsg, wParam, lParam);
+        LeftMouseDown(hwnd, uMsg, wParam, lParam);
         return 0;
     }
     case WM_KEYDOWN:
@@ -154,11 +178,11 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
 
     OutputDebugStringW(L"Creating Brushes for each tile.\n");
 
-    for (int row = 0; row < chessBoard.GetRows(); row++)
+    for (int row = 0; row < board.GetRows(); row++)
     {
-        for (int col = 0; col < chessBoard.GetColumns(); col++)
+        for (int col = 0; col < board.GetColumns(); col++)
         {
-            auto& tile = chessBoard.board[col][row];
+            auto& tile = board.tile[col][row];
             HRESULT hr = renderTarget->CreateSolidColorBrush(tile.currentColor, &tile.pBrush);
         }
     }
@@ -207,52 +231,83 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
     }
 
 
-    ChessPiece newP;
 
-    newP.team = TileTeam::WHITE;
-    newP.type = TileType::PAWN;
-    newP.bitmap = ChessBoard::pPawnBitmap_w;
-    newP.x = 5;
-    newP.y = 5;
-    newP.tileSize = 60;
+    ChessPiece* newP = new ChessPiece;
 
-    boardPieces.pieces[newP.x][newP.y] = newP;
+    newP->team = TileTeam::NONE;
+    newP->type = TileType::NONE;
+    newP->bitmap = ChessBoard::pPawnBitmap_w;
+    newP->x = 3;
+    newP->y = 1;
+    newP->tileSize = 60;
 
+    board.tile[1][3].piece = newP;
+
+
+    ChessPiece* newP2 = new ChessPiece;
+
+    newP2->team = TileTeam::NONE;
+    newP2->type = TileType::NONE;
+    newP2->bitmap = ChessBoard::pPawnBitmap_w;
+    newP2->x = 3;
+    newP2->y = 4;
+    newP2->tileSize = 60;
+
+    board.tile[newP2->y][newP2->x].piece = newP2;
+    
     return S_OK;
 }
 
-void Window32app::LeftClickFunction(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
     int mouseX = GET_X_LPARAM(lParam); // Get the X position of the mouse cursor
     int mouseY = GET_Y_LPARAM(lParam); // Get the Y position of the mouse cursor
 
     const std::wstring rawMouseCoords = L"Mouse X: " + std::to_wstring(mouseX) + L", Mouse y:" + std::to_wstring(mouseY) + L"\n";
     OutputDebugStringW(rawMouseCoords.c_str());
 
-    for (int row = 0; row < chessBoard.GetRows(); row++)
+    for (int row = board.GetRows() - 1; row >= 0; row--)
     {
-        for (int col = 0; col < chessBoard.GetColumns(); col++)
+        for (int col = 0; col < board.GetColumns(); col++)
         {
-            auto& tile = chessBoard.board[col][row];
-            if (chessBoard.IsPointInsidePolygon(mouseX, mouseY, tile.polygon.x0, tile.polygon.y0, tile.polygon.x1, tile.polygon.y1, tile.polygon.x2, tile.polygon.y2, tile.polygon.x3, tile.polygon.y3)) {
-                selectedtileX = tile.x;
-                selectedtileY = tile.y;
+            auto& tile = board.tile[col][row];
+            if (board.IsPointInsidePolygon(mouseX, mouseY, tile.polygon.x0, tile.polygon.y0, tile.polygon.x1, tile.polygon.y1, tile.polygon.x2, tile.polygon.y2, tile.polygon.x3, tile.polygon.y3)) {
                 const std::wstring clickedTileDATA = L"Clicked tile: X: " + std::to_wstring(tile.x) + L",  Y:" + std::to_wstring(tile.y) + L"\n";
-                OutputDebugStringW(clickedTileDATA.c_str());
+
+                OutputDebugStringW(clickedTileDATA.c_str());                
+                
+                if (tile.piece != nullptr) {
+                        selectedtileX = col;
+                        selectedtileY = row;
+                        tile.piece->x = mouseX;
+                        tile.piece->y = mouseY;
+                        draggablePiece = tile.piece;
+                        tile.piece = nullptr;
+                        dragging = true;
+                        OutputDebugStringW(L"Has a piece on.\n");
+                    break;
+
+                    // Now delete the ChessPiece object
+                    //delete board.tile[row][col].piece;
+                    //board.tile[row][col].piece = nullptr;
+                    //OutputDebugStringW(L"Deleted piece.\n");
+                }
+                else {
+                    OutputDebugStringW(L"no piece, (nullptr)\n");
+                }
                 break;
             }
         }
     }
 
-
 }
 
 void Window32app::CleanUp()
 {
-    for (int row = 0; row < chessBoard.GetRows(); row++)
+    for (int row = 0; row < board.GetRows(); row++)
     {
-        for (int col = 0; col < chessBoard.GetColumns(); col++)
+        for (int col = 0; col < board.GetColumns(); col++)
         {
-            auto& tile = chessBoard.board[col][row];
+            auto& tile = board.tile[col][row];
 
             if (tile.pBrush != nullptr) {
                 tile.pBrush->Release();
@@ -276,6 +331,23 @@ void Window32app::CleanUp()
     }
 
     OutputDebugStringW(L"Cleanup all textures.\n");
+
+    for (int row = board.GetRows() - 1; row >= 0; row--)
+    {
+        for (int col = 0; col < board.GetColumns(); col++)
+        {
+
+            auto& tile = board.tile[col][row];
+
+            if (tile.piece != nullptr) {
+                delete board.tile[col][row].piece;
+                board.tile[col][row].piece = nullptr;
+                OutputDebugStringW(L"Pointer destroyed.\n");
+            }
+        }
+    }
+
+    OutputDebugStringW(L"Cleanup all piece pointers.\n");
 }
 
 
@@ -284,11 +356,15 @@ void Window32app::DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitma
 {
     if (bitmap)
     {
-        D2D1_RECT_F destRect = D2D1::RectF(chessBoard.board[y][x].polygon.x0, chessBoard.board[y][x].polygon.y0, 
-            chessBoard.board[y][x].polygon.x0 + width, chessBoard.board[y][x].polygon.y0 + height);
+        auto& tile = board.tile[y][x];
+        float posX = tile.polygon.x0 + (tile.piece ? static_cast<float>(tile.piece->x - x) : 0.0f);
+        float posY = tile.polygon.y0 + (tile.piece ? static_cast<float>(tile.piece->y - y) : 0.0f);
+
+        D2D1_RECT_F destRect = D2D1::RectF(posX, posY, posX + width, posY + height);
         renderTarget->DrawBitmap(bitmap, destRect);
     }
 }
+
 
 
 void Window32app::RenderBoard()
@@ -299,37 +375,37 @@ void Window32app::RenderBoard()
     if (renderTarget)
     {
         D2D1_SIZE_F renderTargetSize = renderTarget->GetSize();
-        int rows = chessBoard.GetRows();
-        int cols = chessBoard.GetColumns();
+        int rows = board.GetRows();
+        int cols = board.GetColumns();
         int minDimension = static_cast<int>(min(renderTargetSize.width, renderTargetSize.height));
 
         int padding = 100; // Padding on all sides (adjust this value as desired)
-        int chessboardSize = minDimension - (2 * padding);
+        int boardSize = minDimension - (2 * padding);
 
         // Calculate the size of each tile based on the available space and padding
-        float tileSize = static_cast<float>(chessboardSize) / static_cast<float>(max(rows, cols));// / 1.25f
+        float tileSize = static_cast<float>(boardSize) / static_cast<float>(max(rows, cols));// / 1.25f
 
-        // Calculate the total size of the chessboard including padding
-        float chessboardWidth = tileSize * cols + (2 * padding);
-        float chessboardHeight = tileSize * rows + (2 * padding);
+        // Calculate the total size of the board including padding
+        float boardWidth = tileSize * cols + (2 * padding);
+        float boardHeight = tileSize * rows + (2 * padding);
 
-        // Calculate the position to center the chessboard within the render target
-        float chessboardX = (renderTargetSize.width - chessboardWidth) / 2;
-        float chessboardY = (renderTargetSize.height - chessboardHeight) / 2;
+        // Calculate the position to center the board within the render target
+        float boardX = (renderTargetSize.width - boardWidth) / 2;
+        float boardY = (renderTargetSize.height - boardHeight) / 2 + boardHeight - tileSize; // Shift the board down
 
         // Clear the render target
         renderTarget->BeginDraw();
         renderTarget->Clear(D2D1::ColorF(D2D1::ColorF(0.15, 0.15, 0.15, 1)));
 
 
-        for (int row = 0; row < chessBoard.GetRows(); row++)
+        for (int row = board.GetRows() - 1; row >= 0; row--)
         {
-            for (int col = 0; col < chessBoard.GetColumns(); col++)
+            for (int col = 0; col < board.GetColumns(); col++)
             {
-                auto& tile = chessBoard.board[col][row];
+                auto& tile = board.tile[col][row];
 
-                float x = chessboardX + padding + tile.x * tileSize;
-                float y = chessboardY + padding + tile.y * tileSize;
+                float x = boardX + padding + tile.x * tileSize;
+                float y = boardY - padding - tile.y * tileSize;
 
                 tile.tileSize = tileSize;
 
@@ -342,76 +418,92 @@ void Window32app::RenderBoard()
 
 
                 renderTarget->FillRectangle(D2D1::RectF(x, y, x + tileSize, y + tileSize), tile.pBrush);
-
-                if (tile.x == chessBoard.board[selectedtileY][selectedtileX].x && tile.y == chessBoard.board[selectedtileY][selectedtileX].y && selectedtileX >= 0 && selectedtileY >= 0) {
-
-                    // Create a solid color brush for the dots
-                    ID2D1SolidColorBrush* dotBrush = nullptr;
-                    HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0, 1.0f, 0), &dotBrush);
-                    if (FAILED(hr))
-                    {
-                        // Handle the error if necessary
-                    }
-
-                    // Draw four dots for each point of the tile polygon
-                    D2D1_ELLIPSE dotEllipse;
-                    float dotRadius = 4.0f; // Adjust the dot radius as needed
-
-                    // Draw dot for point (x0, y0)
-                    dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
-                    dotEllipse.radiusX = dotEllipse.radiusY = dotRadius;
-                    renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-                    // Draw dot for point (x1, y1)
-                    dotEllipse.point = D2D1::Point2F(tile.polygon.x1, tile.polygon.y1);
-                    renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-                    // Draw dot for point (x2, y2)
-                    dotEllipse.point = D2D1::Point2F(tile.polygon.x2, tile.polygon.y2);
-                    renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-                    // Draw dot for point (x3, y3)
-                    dotEllipse.point = D2D1::Point2F(tile.polygon.x3, tile.polygon.y3);
-                    renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-                    // Release the dot brush after use
-                    dotBrush->Release();
-                    dotBrush = nullptr;
-                }
             }
         }
 
-        for (int row = 0; row < chessBoard.GetRows(); row++)
-        {
-            for (int col = 0; col < chessBoard.GetColumns(); col++)
+
+        auto& tile = board.tile[selectedtileX][selectedtileY];
+
+        if (tile.x == board.tile[selectedtileX][selectedtileY].x && tile.y == board.tile[selectedtileX][selectedtileY].y && selectedtileY >= 0 && selectedtileX >= 0) {
+
+            // Create a solid color brush for the dots
+            ID2D1SolidColorBrush* dotBrush = nullptr;
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0, 1.0f, 0), &dotBrush);
+            if (FAILED(hr))
             {
-                if (boardPieces.pieces[col][row].type != TileType::NONE) {
-                    //OutputDebugStringW(L"FOUND A PIECE!.\n");
-                    //DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, boardPieces.pieces[col][row].x, boardPieces.pieces[col][row].y, tileSize, tileSize);
-                    DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, selectedtileX, selectedtileY, tileSize, tileSize);
+                // Handle the error if necessary
+            }
+
+            // Draw four dots for each point of the tile polygon
+            D2D1_ELLIPSE dotEllipse;
+            float dotRadius = 6.0f; // Adjust the dot radius as needed
+
+            // Draw dot for point (x0, y0)
+            dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
+            dotEllipse.radiusX = dotEllipse.radiusY = dotRadius;
+            renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+            // Draw dot for point (x1, y1)
+            dotEllipse.point = D2D1::Point2F(tile.polygon.x1, tile.polygon.y1);
+            renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+            // Draw dot for point (x2, y2)
+            dotEllipse.point = D2D1::Point2F(tile.polygon.x2, tile.polygon.y2);
+            renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+            // Draw dot for point (x3, y3)
+            dotEllipse.point = D2D1::Point2F(tile.polygon.x3, tile.polygon.y3);
+            renderTarget->FillEllipse(dotEllipse, dotBrush);
+
+            // Release the dot brush after use
+            dotBrush->Release();
+            dotBrush = nullptr;
+        }
+
+        for (int row = 0; row < board.GetRows(); row++)
+        {
+            for (int col = 0; col < board.GetColumns(); col++)
+            {
+                if (board.tile[col][row].piece) {
+                    board.tile[col][row].padding = padding;
+                    board.tile[col][row].tileSize = tileSize;
+                    DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, board.tile[col][row].piece->x, board.tile[col][row].piece->y, tileSize, tileSize);
                 }
+                //if (boardPieces.pieces[col][row].type != TileType::NONE) {
+                    //OutputDebugStringW(L"FOUND A PIECE!.\n");
+                    //DrawBitmap(renderTarget, board::pPawnBitmap_w, boardPieces.pieces[col][row].x, boardPieces.pieces[col][row].y, tileSize, tileSize);
+                   // DrawBitmap(renderTarget, board::pPawnBitmap_w, boardPieces.pieces[col][row].x, boardPieces.pieces[col][row].y, tileSize, tileSize);
+                //}
             }
         }
 
+        if (draggablePiece) {
+
+            int dragX = draggablePiece->x - (tileSize / 2);
+            int dragY = draggablePiece->y - (tileSize / 2);
+            D2D1_RECT_F destRect = D2D1::RectF(dragX, dragY, dragX + draggablePiece->tileSize, dragY + draggablePiece->tileSize);
+            renderTarget->DrawBitmap(ChessBoard::pPawnBitmap_w, destRect);
+            //DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, draggablePiece->x, draggablePiece->y, tileSize, tileSize);
+        }
         /*
-    for (size_t i = 0; i < chessBoard.pieces.size(); i++)
+    for (size_t i = 0; i < board.pieces.size(); i++)
     {
-        if (chessBoard.pieces[i].bitmap == nullptr) {
+        if (board.pieces[i].bitmap == nullptr) {
             OutputDebugStringW(L"NULLPTR BITMAP.\n");
         }
         else {
-            std::wstring test = L"Bitmap here, bitmap width = " + std::to_wstring(chessBoard.pieces[i].bitmap->GetSize().width);
+            std::wstring test = L"Bitmap here, bitmap width = " + std::to_wstring(board.pieces[i].bitmap->GetSize().width);
             OutputDebugStringW(test.c_str());
         }
 
-        //std::wstring tester = L"Piece = (" + std::to_wstring(i) + L") x: " + std::to_wstring(chessBoard.pieces[i].x);
+        //std::wstring tester = L"Piece = (" + std::to_wstring(i) + L") x: " + std::to_wstring(board.pieces[i].x);
         //OutputDebugStringW(tester.c_str());
 
 
-        DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, chessBoard.pieces[i].x,
-            chessBoard.pieces[i].y, tileSize, tileSize);
+        DrawBitmap(renderTarget, board::pPawnBitmap_w, board.pieces[i].x,
+            board.pieces[i].y, tileSize, tileSize);
     }*/
-    //DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, chessBoard.board[0][0].polygon.x0, chessBoard.board[0][0].polygon.y0, tileSize, tileSize);
+    //DrawBitmap(renderTarget, board::pPawnBitmap_w, board.board[0][0].polygon.x0, board.board[0][0].polygon.y0, tileSize, tileSize);
 
     // End drawing
         renderTarget->EndDraw();
