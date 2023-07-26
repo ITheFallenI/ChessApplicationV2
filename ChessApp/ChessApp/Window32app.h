@@ -21,5 +21,8 @@ private:
 	static void CleanUp();
 
 	static void DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitmap, int x, int y, float width, float height);
+
+	static void AddDefaultBoard();
+	static void DeleteAllPieces();
 };
 

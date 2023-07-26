@@ -224,31 +224,8 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
         // Failed to load the white pawn bitmap
     }
 
+    AddDefaultBoard();
 
-
-    ChessPiece* newP = new ChessPiece;
-
-    newP->team = TileTeam::NONE;
-    newP->type = TileType::NONE;
-    newP->bitmap = ChessBoard::pPawnBitmap_w;
-    newP->x = 3;
-    newP->y = 1;
-    newP->tileSize = 60;
-
-    board.tile[1][3].piece = newP;
-
-
-    ChessPiece* newP2 = new ChessPiece;
-
-    newP2->team = TileTeam::NONE;
-    newP2->type = TileType::NONE;
-    newP2->bitmap = ChessBoard::pPawnBitmap_w;
-    newP2->x = 3;
-    newP2->y = 4;
-    newP2->tileSize = 60;
-
-    board.tile[newP2->y][newP2->x].piece = newP2;
-    
     return S_OK;
 }
 
@@ -266,11 +243,17 @@ void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         {
             auto& tile = board.tile[col][row];
             if (board.IsPointInsidePolygon(mouseX, mouseY, tile.polygon.x0, tile.polygon.y0, tile.polygon.x1, tile.polygon.y1, tile.polygon.x2, tile.polygon.y2, tile.polygon.x3, tile.polygon.y3)) {
-                const std::wstring clickedTileDATA = L"Clicked tile: X: " + std::to_wstring(tile.x) + L",  Y:" + std::to_wstring(tile.y) + L"\n";
+                const std::wstring clickedTileDATA = L"Clicked tile: X: " + std::to_wstring(tile.col) + L",  Y:" + std::to_wstring(tile.y) + L"\n";
 
                 OutputDebugStringW(clickedTileDATA.c_str());                
                 
-                if (tile.piece != nullptr) {
+                if (tile.piece != nullptr && !dragging) {
+                        OutputDebugStringW(L"Has a piece on.\n");
+                        if (tile.piece->type == TileType::PAWN) {
+                            OutputDebugStringW(L"we're a pawn, get valid pawn moves.\n");
+                            //we're a pawn check for valid pawn moves..
+                            validTiles = getValidPawnMove(tile, board);
+                        }
                         selectedtileX = col;
                         selectedtileY = row;
                         tile.piece->x = mouseX;
@@ -278,13 +261,7 @@ void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                         draggablePiece = tile.piece;
                         tile.piece = nullptr;
                         dragging = true;
-                        OutputDebugStringW(L"Has a piece on.\n");
                     break;
-
-                    // Now delete the ChessPiece object
-                    //delete board.tile[row][col].piece;
-                    //board.tile[row][col].piece = nullptr;
-                    //OutputDebugStringW(L"Deleted piece.\n");
                 }
                 else {
                     OutputDebugStringW(L"no piece, (nullptr)\n");
@@ -311,16 +288,33 @@ void Window32app::LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
             auto& tile = board.tile[col][row];
             if (board.IsPointInsidePolygon(mouseX, mouseY, tile.polygon.x0, tile.polygon.y0, tile.polygon.x1, tile.polygon.y1, tile.polygon.x2, tile.polygon.y2, tile.polygon.x3, tile.polygon.y3)) 
             {
-                //if slot is valid move check to go here
-                if (dragging && draggablePiece) {
-                    draggablePiece->x = tile.y;
-                    draggablePiece->y = tile.x;
-                    selectedtileX = tile.x;
-                    selectedtileY = tile.y;
-                    tile.piece = draggablePiece;
-                    draggablePiece = nullptr;
-                    dragging = false;
-                    break;
+                // Check if the current tile is in the validTiles list
+                auto it = std::find(validTiles.begin(), validTiles.end(), tile);
+
+                if (it != validTiles.end()) {
+                    //if slot is valid move check to go here
+                    if (dragging && draggablePiece && !tile.piece) {
+                        OutputDebugStringW(L"Placed on valid tile.\n\n");
+                        draggablePiece->x = tile.y;
+                        draggablePiece->y = tile.col;
+                        selectedtileX = tile.col;
+                        selectedtileY = tile.y;
+                        tile.piece = draggablePiece;
+                        draggablePiece = nullptr;
+                        dragging = false;
+                        validTiles.clear();
+                        break;
+                    }
+                }else{
+
+                    if (dragging && draggablePiece) {
+                        draggablePiece->x = selectedtileY;
+                        draggablePiece->y = selectedtileX;
+                        board.tile[selectedtileX][selectedtileY].piece = draggablePiece;
+                        draggablePiece = nullptr;
+                        dragging = false;
+                    }
+                    OutputDebugStringW(L"Place Error: invalid tile.\n\n");
                 }
             }
         }
@@ -405,7 +399,50 @@ void Window32app::DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitma
     }
 }
 
+void Window32app::AddDefaultBoard() 
+{
+    ChessPiece* newP = new ChessPiece;
 
+    newP->team = TileTeam::WHITE;
+    newP->type = TileType::PAWN;
+    newP->bitmap = ChessBoard::pPawnBitmap_w;
+    newP->x = 3;
+    newP->y = 1;
+    newP->tileSize = 60;
+
+    board.tile[1][3].piece = newP;
+
+
+    ChessPiece* newP2 = new ChessPiece;
+
+    newP2->team = TileTeam::WHITE;
+    newP2->type = TileType::PAWN;
+    newP2->bitmap = ChessBoard::pPawnBitmap_w;
+    newP2->x = 3;
+    newP2->y = 4;
+    newP2->tileSize = 60;
+
+    board.tile[newP2->y][newP2->x].piece = newP2;
+
+
+    ChessPiece* newP_b = new ChessPiece;
+
+    newP_b->team = TileTeam::BLACK;
+    newP_b->type = TileType::PAWN;
+    newP_b->bitmap = ChessBoard::pPawnBitmap_b;
+    newP_b->x = 6;
+    newP_b->y = 1;
+    newP_b->tileSize = 60;
+
+
+    board.tile[newP_b->y][newP_b->x].piece = newP_b;
+}
+
+
+void Window32app::DeleteAllPieces()
+{
+
+}
 
 void Window32app::RenderBoard()
 {
@@ -444,7 +481,7 @@ void Window32app::RenderBoard()
             {
                 auto& tile = board.tile[col][row];
 
-                float x = boardX + padding + tile.x * tileSize;
+                float x = boardX + padding + tile.col * tileSize;
                 float y = boardY - padding - tile.y * tileSize;
 
                 tile.polygon = TilePolygon{
@@ -459,14 +496,39 @@ void Window32app::RenderBoard()
             }
         }
 
+        //valid tiles render.
+        for (const ChessTile& tile : validTiles) {
+            // Calculate the center of the tile
+            int col = tile.col;
+            int y = tile.y;
+            ChessTile tileOnBoard = board.tile[col][y];
+            float centerX = (tileOnBoard.polygon.x0 + tileOnBoard.polygon.x1 + tileOnBoard.polygon.x2 + tileOnBoard.polygon.x3) / 4.0f;
+            float centerY = (tileOnBoard.polygon.y0 + tileOnBoard.polygon.y1 + tileOnBoard.polygon.y2 + tileOnBoard.polygon.y3) / 4.0f;
 
+            // Create the ellipse centered at the tile's center
+            ID2D1SolidColorBrush* test = nullptr;
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0.250f, 1.0f, 0.25f, 0.5f), &test);
+            D2D1_ELLIPSE dec;
+            float dotRadius = tileSize / 5; // Adjust the dot radius as needed (smaller value for smaller dots)
+
+            dec.point = D2D1::Point2F(centerX, centerY);
+            dec.radiusX = dec.radiusY = dotRadius;
+
+            // Draw the ellipse on the valid tile
+            renderTarget->FillEllipse(dec, test);
+
+            // Release the dot brush after use
+            test->Release();
+            test = nullptr;
+        }
+
+        //debug selected tile
         auto& tile = board.tile[selectedtileX][selectedtileY];
-
-        if (tile.x == board.tile[selectedtileX][selectedtileY].x && tile.y == board.tile[selectedtileX][selectedtileY].y && selectedtileY >= 0 && selectedtileX >= 0) {
+        if (tile.col == board.tile[selectedtileX][selectedtileY].col && tile.y == board.tile[selectedtileX][selectedtileY].y && selectedtileY >= 0 && selectedtileX >= 0) {
 
             // Create a solid color brush for the dots
             ID2D1SolidColorBrush* dotBrush = nullptr;
-            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0, 1.0f, 0), &dotBrush);
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(1.0f, 0.9f, 0), &dotBrush);
             if (FAILED(hr))
             {
                 // Handle the error if necessary
@@ -474,7 +536,7 @@ void Window32app::RenderBoard()
 
             // Draw four dots for each point of the tile polygon
             D2D1_ELLIPSE dotEllipse;
-            float dotRadius = 6.0f; // Adjust the dot radius as needed
+            float dotRadius = tileSize / 10; // Adjust the dot radius as needed
 
             // Draw dot for point (x0, y0)
             dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
@@ -498,19 +560,16 @@ void Window32app::RenderBoard()
             dotBrush = nullptr;
         }
 
+
+        //pieces
         for (int row = 0; row < board.GetRows(); row++)
         {
             for (int col = 0; col < board.GetColumns(); col++)
             {
                 if (board.tile[col][row].piece) {
                     board.tile[col][row].padding = padding;
-                    DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, board.tile[col][row].piece->x, board.tile[col][row].piece->y, tileSize, tileSize);
+                    DrawBitmap(renderTarget, board.tile[col][row].piece->bitmap, board.tile[col][row].piece->x, board.tile[col][row].piece->y, tileSize, tileSize);
                 }
-                //if (boardPieces.pieces[col][row].type != TileType::NONE) {
-                    //OutputDebugStringW(L"FOUND A PIECE!.\n");
-                    //DrawBitmap(renderTarget, board::pPawnBitmap_w, boardPieces.pieces[col][row].x, boardPieces.pieces[col][row].y, tileSize, tileSize);
-                   // DrawBitmap(renderTarget, board::pPawnBitmap_w, boardPieces.pieces[col][row].x, boardPieces.pieces[col][row].y, tileSize, tileSize);
-                //}
             }
         }
 
@@ -518,28 +577,8 @@ void Window32app::RenderBoard()
             int dragX = draggablePiece->x - (tileSize / 2);
             int dragY = draggablePiece->y - (tileSize / 2);
             D2D1_RECT_F destRect = D2D1::RectF(dragX, dragY, dragX + tileSize, dragY + tileSize);
-            renderTarget->DrawBitmap(ChessBoard::pPawnBitmap_w, destRect);
-            //DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, draggablePiece->x, draggablePiece->y, tileSize, tileSize);
+            renderTarget->DrawBitmap(draggablePiece->bitmap, destRect);
         }
-        /*
-    for (size_t i = 0; i < board.pieces.size(); i++)
-    {
-        if (board.pieces[i].bitmap == nullptr) {
-            OutputDebugStringW(L"NULLPTR BITMAP.\n");
-        }
-        else {
-            std::wstring test = L"Bitmap here, bitmap width = " + std::to_wstring(board.pieces[i].bitmap->GetSize().width);
-            OutputDebugStringW(test.c_str());
-        }
-
-        //std::wstring tester = L"Piece = (" + std::to_wstring(i) + L") x: " + std::to_wstring(board.pieces[i].x);
-        //OutputDebugStringW(tester.c_str());
-
-
-        DrawBitmap(renderTarget, board::pPawnBitmap_w, board.pieces[i].x,
-            board.pieces[i].y, tileSize, tileSize);
-    }*/
-    //DrawBitmap(renderTarget, board::pPawnBitmap_w, board.board[0][0].polygon.x0, board.board[0][0].polygon.y0, tileSize, tileSize);
 
     // End drawing
         renderTarget->EndDraw();
