@@ -3,6 +3,8 @@
 
 ID2D1Bitmap* ChessBoard::pPawnBitmap_w = nullptr;
 ID2D1Bitmap* ChessBoard::pPawnBitmap_b = nullptr;
+ID2D1Bitmap* ChessBoard::pKnightBitmap_w = nullptr;
+ID2D1Bitmap* ChessBoard::pKnightBitmap_b = nullptr;
 
 // Overload the << operator for PieceType enum
 std::ostream& operator<<(std::ostream& os, const TileType& pieceType)
@@ -15,6 +17,9 @@ std::ostream& operator<<(std::ostream& os, const TileType& pieceType)
 	case TileType::PAWN:
 		os << "Pawn";
 		break;
+    case TileType::KNIGHT:
+        os << "Knight";
+        break;
 		// Add more cases for other PieceType values if needed
 	default:
 		os << "Unknown";
@@ -58,10 +63,9 @@ ChessBoard::ChessBoard()
 			D2D1_COLOR_F genColor = (col + row) % 2 == 0 ? D2D1::ColorF(1, 0.8, 0.61, 1) :
 				D2D1::ColorF(0.81, 0.54, 0.275, 1);
 
-
 			// Set values for each ChessTile in the board
             tile[col][row].col = col;
-            tile[col][row].y = row;
+            tile[col][row].row = row;
             tile[col][row].pBrush = nullptr;
             tile[col][row].defaultColor = genColor;
             tile[col][row].currentColor = genColor;

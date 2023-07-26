@@ -22,6 +22,7 @@ private:
 
 	static void DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitmap, int x, int y, float width, float height);
 
+	//static void LoadTexturePiece(std::wstring pngFile, ID2D1Bitmap** ppBitmap);
 	static void AddDefaultBoard();
 	static void DeleteAllPieces();
 };
