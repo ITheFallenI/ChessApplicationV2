@@ -23,8 +23,6 @@ std::ostream& operator<<(std::ostream& os, const TileType& pieceType)
 	return os;
 }
 
-
-
 // Overload the << operator for PieceType enum
 std::ostream& operator<<(std::ostream& os, const TileTeam& PieceTeam)
 {
@@ -62,7 +60,7 @@ ChessBoard::ChessBoard()
 
 
 			// Set values for each ChessTile in the board
-            tile[col][row].x = col;
+            tile[col][row].col = col;
             tile[col][row].y = row;
             tile[col][row].pBrush = nullptr;
             tile[col][row].defaultColor = genColor;
@@ -194,4 +192,3 @@ HRESULT ChessBoard::LoadChessPieceTexture(ID2D1RenderTarget* pRenderTarget, cons
 
     return hr;
 }
-
