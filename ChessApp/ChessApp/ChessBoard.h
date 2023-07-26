@@ -52,7 +52,6 @@ struct ChessTile
     int x = -1;
     int y = -1;
     int padding = 0;
-    int tileSize = 0;
     ChessPiece* piece = nullptr;
     ChessTile() = default;
 };

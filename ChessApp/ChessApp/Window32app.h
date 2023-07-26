@@ -17,6 +17,7 @@ private:
 	static HRESULT DirectXsetup(HWND hwnd);
 	static void RenderBoard();
 	static void LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	static void LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	static void CleanUp();
 
 	static void DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitmap, int x, int y, float width, float height);
