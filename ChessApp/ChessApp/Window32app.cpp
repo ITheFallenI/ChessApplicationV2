@@ -85,8 +85,7 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     case WM_MOUSEMOVE: {
         if (dragging) {
             if (draggablePiece != nullptr) {
-                OutputDebugStringW(L"draggable piece! here.\n");
-
+                //OutputDebugStringW(L"draggable piece! here.\n");
                 draggablePiece->x = static_cast<float>(LOWORD(lParam));
                 draggablePiece->y = static_cast<float>(HIWORD(lParam));
             }
@@ -96,6 +95,9 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
         return 0;
     }
     case WM_LBUTTONUP: {
+
+        LeftMouseUp(hwnd, uMsg, wParam, lParam);
+
         if (dragging && draggablePiece) {
             draggablePiece->x = selectedtileY;
             draggablePiece->y = selectedtileX;
@@ -258,11 +260,12 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
     return S_OK;
 }
 
-void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) {
+void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
     int mouseX = GET_X_LPARAM(lParam); // Get the X position of the mouse cursor
     int mouseY = GET_Y_LPARAM(lParam); // Get the Y position of the mouse cursor
 
-    const std::wstring rawMouseCoords = L"Mouse X: " + std::to_wstring(mouseX) + L", Mouse y:" + std::to_wstring(mouseY) + L"\n";
+    const std::wstring rawMouseCoords = L"Mouse Down: Mouse X: " + std::to_wstring(mouseX) + L", Mouse y:" + std::to_wstring(mouseY) + L"\n";
     OutputDebugStringW(rawMouseCoords.c_str());
 
     for (int row = board.GetRows() - 1; row >= 0; row--)
@@ -300,6 +303,17 @@ void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     }
 
 }
+
+void Window32app::LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam) 
+{
+    int mouseX = GET_X_LPARAM(lParam); // Get the X position of the mouse cursor
+    int mouseY = GET_Y_LPARAM(lParam); // Get the Y position of the mouse cursor
+
+    const std::wstring rawMouseCoords = L"Mouse Up: Mouse X: " + std::to_wstring(mouseX) + L", Mouse y:" + std::to_wstring(mouseY) + L"\n";
+    OutputDebugStringW(rawMouseCoords.c_str());
+}
+
+
 
 void Window32app::CleanUp()
 {
@@ -347,6 +361,10 @@ void Window32app::CleanUp()
         }
     }
 
+    if (draggablePiece) {
+        delete draggablePiece;
+        draggablePiece = nullptr;
+    }
     OutputDebugStringW(L"Cleanup all piece pointers.\n");
 }
 
@@ -407,8 +425,6 @@ void Window32app::RenderBoard()
                 float x = boardX + padding + tile.x * tileSize;
                 float y = boardY - padding - tile.y * tileSize;
 
-                tile.tileSize = tileSize;
-
                 tile.polygon = TilePolygon{
                     x, y,                  // Top-left
                     x + tileSize, y,       // Top-right
@@ -466,7 +482,6 @@ void Window32app::RenderBoard()
             {
                 if (board.tile[col][row].piece) {
                     board.tile[col][row].padding = padding;
-                    board.tile[col][row].tileSize = tileSize;
                     DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, board.tile[col][row].piece->x, board.tile[col][row].piece->y, tileSize, tileSize);
                 }
                 //if (boardPieces.pieces[col][row].type != TileType::NONE) {
@@ -478,10 +493,9 @@ void Window32app::RenderBoard()
         }
 
         if (draggablePiece) {
-
             int dragX = draggablePiece->x - (tileSize / 2);
             int dragY = draggablePiece->y - (tileSize / 2);
-            D2D1_RECT_F destRect = D2D1::RectF(dragX, dragY, dragX + draggablePiece->tileSize, dragY + draggablePiece->tileSize);
+            D2D1_RECT_F destRect = D2D1::RectF(dragX, dragY, dragX + tileSize, dragY + tileSize);
             renderTarget->DrawBitmap(ChessBoard::pPawnBitmap_w, destRect);
             //DrawBitmap(renderTarget, ChessBoard::pPawnBitmap_w, draggablePiece->x, draggablePiece->y, tileSize, tileSize);
         }

@@ -3,22 +3,18 @@ F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(29,17): warn
 F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(30,17): warning C4244: 'initializing': conversion from 'FLOAT' to 'int', possible loss of data
 F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(47,85): warning C4244: 'argument': conversion from 'FLOAT' to 'int', possible loss of data
 F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(47,54): warning C4244: 'argument': conversion from 'FLOAT' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(89,56): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
 F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(90,56): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(91,56): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(117,64): warning C4244: '=': conversion from 'FLOAT' to 'LONG', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(118,64): warning C4244: '=': conversion from 'FLOAT' to 'LONG', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(273,52): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(273,44): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(398,67): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(398,61): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(398,55): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(410,33): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(469,53): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(482,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(483,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(484,102): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(484,68): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(484,55): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(484,48): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
-F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(159): warning C4715: 'Window32app::WindowProc': not all control paths return a value
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(119,64): warning C4244: '=': conversion from 'FLOAT' to 'LONG', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(120,64): warning C4244: '=': conversion from 'FLOAT' to 'LONG', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(276,52): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(276,44): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(416,67): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(416,61): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(416,55): warning C4305: 'argument': truncation from 'double' to 'FLOAT'
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(496,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(497,23): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(498,55): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(498,48): warning C4244: 'argument': conversion from 'int' to 'FLOAT', possible loss of data
+F:\repos\Chess\ChessApplicationV2\ChessApp\ChessApp\Window32app.cpp(161): warning C4715: 'Window32app::WindowProc': not all control paths return a value
   ChessApp.vcxproj -> F:\repos\Chess\ChessApplicationV2\ChessApp\x64\Debug\ChessApp.exe
