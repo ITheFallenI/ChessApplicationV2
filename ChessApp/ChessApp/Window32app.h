@@ -25,5 +25,7 @@ private:
 	//static void LoadTexturePiece(std::wstring pngFile, ID2D1Bitmap** ppBitmap);
 	static void AddDefaultBoard();
 	static void DeleteAllPieces();
+
+	static void LoadTexture(std::wstring textureName, ID2D1Bitmap** ppBitmap);
 };
 
