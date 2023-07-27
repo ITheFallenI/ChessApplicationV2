@@ -192,6 +192,12 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
     LoadTexture(L"\\img\\knight_w.png", &ChessBoard::pKnightBitmap_w);
     LoadTexture(L"\\img\\knight_b.png", &ChessBoard::pKnightBitmap_b);
 
+    LoadTexture(L"\\img\\rook_w.png", &ChessBoard::pRookBitmap_w);
+    LoadTexture(L"\\img\\rook_b.png", &ChessBoard::pRookBitmap_b);
+
+    LoadTexture(L"\\img\\bishop_w.png", &ChessBoard::pBishopBitmap_w);
+    LoadTexture(L"\\img\\bishop_b.png", &ChessBoard::pBishopBitmap_b);
+
     OutputDebugStringW(L"Textures loaded..\n");
 
     OutputDebugStringW(L"Adding pieces to board.\n");
@@ -405,62 +411,51 @@ void Window32app::DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitma
 
 void Window32app::AddDefaultBoard() 
 {
-    ChessPiece* newP = new ChessPiece;
+    
+    //white
+    AddPieceToBoard(0, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(1, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(2, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(3, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(4, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(5, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(6, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(7, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
 
-    newP->team = TileTeam::WHITE;
-    newP->type = TileType::PAWN;
-    newP->bitmap = ChessBoard::pPawnBitmap_w;
-    newP->col = 1;
-    newP->row = 0;
+    //hprses
+    AddPieceToBoard(1, 0, TileTeam::WHITE, TileType::KNIGHT, ChessBoard::pKnightBitmap_w);
+    AddPieceToBoard(6, 0, TileTeam::WHITE, TileType::KNIGHT, ChessBoard::pKnightBitmap_w);
 
-    board.tile[newP->col][newP->row].piece = newP;
+    //bishop
+    AddPieceToBoard(2, 0, TileTeam::WHITE, TileType::BISHOP, ChessBoard::pBishopBitmap_w);
+    AddPieceToBoard(5, 0, TileTeam::WHITE, TileType::BISHOP, ChessBoard::pBishopBitmap_w);
 
-
-    ChessPiece* newP2 = new ChessPiece;
-
-    newP2->team = TileTeam::WHITE;
-    newP2->type = TileType::PAWN;
-    newP2->bitmap = ChessBoard::pPawnBitmap_w;
-    newP2->col = 4;
-    newP2->row = 3;
-
-    board.tile[newP2->col][newP2->row].piece = newP2;
-
-
-    ChessPiece* newK1 = new ChessPiece;
-
-    newK1->team = TileTeam::WHITE;
-    newK1->type = TileType::KNIGHT;
-    newK1->bitmap = ChessBoard::pKnightBitmap_w;
-    newK1->col = 5;
-    newK1->row = 5;
-
-    board.tile[newK1->col][newK1->row].piece = newK1;
-
+    //rooks
+    AddPieceToBoard(7, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
+    AddPieceToBoard(0, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
 
     //black
-    ChessPiece* newP_b = new ChessPiece;
+    AddPieceToBoard(0,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(1,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(2,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(3,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(4,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(5,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(6,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(7,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
 
-    newP_b->team = TileTeam::BLACK;
-    newP_b->type = TileType::PAWN;
-    newP_b->bitmap = ChessBoard::pPawnBitmap_b;
-    newP_b->col = 1;
-    newP_b->row = 6;
+    //hprses
+    AddPieceToBoard(1, 7, TileTeam::BLACK, TileType::KNIGHT, ChessBoard::pKnightBitmap_b);
+    AddPieceToBoard(6, 7, TileTeam::BLACK, TileType::KNIGHT, ChessBoard::pKnightBitmap_b);
 
+    //bishop
+    AddPieceToBoard(2, 7, TileTeam::BLACK, TileType::BISHOP, ChessBoard::pBishopBitmap_b);
+    AddPieceToBoard(5, 7, TileTeam::BLACK, TileType::BISHOP, ChessBoard::pBishopBitmap_b);
 
-    board.tile[newP_b->col][newP_b->row].piece = newP_b;
+    //rooks
+    AddPieceToBoard(7, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
+    AddPieceToBoard(0, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
 
-
-    ChessPiece* newP_b2 = new ChessPiece;
-
-    newP_b2->team = TileTeam::BLACK;
-    newP_b2->type = TileType::PAWN;
-    newP_b2->bitmap = ChessBoard::pPawnBitmap_b;
-    newP_b2->col = 2;
-    newP_b2->row = 6;
-
-
-    board.tile[newP_b2->col][newP_b2->row].piece = newP_b2;
 }
 
 
@@ -553,6 +548,25 @@ void Window32app::RenderBoard()
             test->Release();
             test = nullptr;
         }
+        //pieces
+        for (int row = 0; row < board.GetRows(); row++)
+        {
+            for (int col = 0; col < board.GetColumns(); col++)
+            {
+                if (board.tile[col][row].piece) {
+                    board.tile[col][row].padding = padding;
+                    DrawBitmap(renderTarget, board.tile[col][row].piece->bitmap, board.tile[col][row].piece->row, board.tile[col][row].piece->col, tileSize, tileSize);
+                }
+            }
+        }
+
+        if (draggablePiece) {
+            int dragRow = draggablePiece->row - (tileSize / 2);
+            int dragCol = draggablePiece->col - (tileSize / 2);
+            D2D1_RECT_F destRect = D2D1::RectF(dragRow, dragCol, dragRow + tileSize, dragCol + tileSize);
+            renderTarget->DrawBitmap(draggablePiece->bitmap, destRect);
+        }
+
 
         //debug selected tile
         auto& tile = board.tile[selectedtileCol][selectedtileRow];
@@ -590,26 +604,6 @@ void Window32app::RenderBoard()
             // Release the dot brush after use
             dotBrush->Release();
             dotBrush = nullptr;
-        }
-
-
-        //pieces
-        for (int row = 0; row < board.GetRows(); row++)
-        {
-            for (int col = 0; col < board.GetColumns(); col++)
-            {
-                if (board.tile[col][row].piece) {
-                    board.tile[col][row].padding = padding;
-                    DrawBitmap(renderTarget, board.tile[col][row].piece->bitmap, board.tile[col][row].piece->row, board.tile[col][row].piece->col, tileSize, tileSize);
-                }
-            }
-        }
-
-        if (draggablePiece) {
-            int dragRow = draggablePiece->row - (tileSize / 2);
-            int dragCol = draggablePiece->col - (tileSize / 2);
-            D2D1_RECT_F destRect = D2D1::RectF(dragRow, dragCol, dragRow + tileSize, dragCol + tileSize);
-            renderTarget->DrawBitmap(draggablePiece->bitmap, destRect);
         }
 
     // End drawing
@@ -653,4 +647,17 @@ void Window32app::LoadTexture(std::wstring textureName, ID2D1Bitmap** ppBitmap)
         std::wstring fal = L"(" + textureName + L" ) failed! \n";
         OutputDebugStringW(fal.c_str());
     }
+}
+
+void Window32app::AddPieceToBoard(int m_col, int m_row, TileTeam m_team, TileType m_type, ID2D1Bitmap* m_bitmap) {
+
+    ChessPiece* newPiece = new ChessPiece;
+
+    newPiece->team = m_team;
+    newPiece->type = m_type;
+    newPiece->bitmap = m_bitmap;
+    newPiece->col = m_col;
+    newPiece->row = m_row;
+
+    board.tile[newPiece->col][newPiece->row].piece = newPiece;
 }

@@ -3,8 +3,15 @@
 
 ID2D1Bitmap* ChessBoard::pPawnBitmap_w = nullptr;
 ID2D1Bitmap* ChessBoard::pPawnBitmap_b = nullptr;
+
 ID2D1Bitmap* ChessBoard::pKnightBitmap_w = nullptr;
 ID2D1Bitmap* ChessBoard::pKnightBitmap_b = nullptr;
+
+ID2D1Bitmap* ChessBoard::pRookBitmap_w = nullptr;
+ID2D1Bitmap* ChessBoard::pRookBitmap_b = nullptr;
+
+ID2D1Bitmap* ChessBoard::pBishopBitmap_w = nullptr;
+ID2D1Bitmap* ChessBoard::pBishopBitmap_b = nullptr;
 
 // Overload the << operator for PieceType enum
 std::ostream& operator<<(std::ostream& os, const TileType& pieceType)
