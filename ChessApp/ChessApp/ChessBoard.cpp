@@ -92,7 +92,7 @@ bool ChessBoard::IsPointInsidePolygon(float x, float y, float x0, float y0, floa
 }
 
 
-HRESULT ChessBoard::LoadChessPieceTexture(ID2D1RenderTarget* pRenderTarget, const wchar_t* filePath, ID2D1Bitmap** ppBitmap)
+HRESULT ChessBoard::CreateBitmapFromTexture(ID2D1RenderTarget* pRenderTarget, const wchar_t* filePath, ID2D1Bitmap** ppBitmap)
 {
     ID2D1Bitmap* pBitmap = nullptr;
     IWICImagingFactory* pWICFactory = nullptr;

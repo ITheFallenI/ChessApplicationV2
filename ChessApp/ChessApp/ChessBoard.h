@@ -80,7 +80,7 @@ public:
     int GetColumns() const { return 8; }
     bool IsPointInsidePolygon(float x, float y, float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3);
 
-    static HRESULT LoadChessPieceTexture(ID2D1RenderTarget* pRenderTarget, const wchar_t* filePath, ID2D1Bitmap** ppBitmap);
+    static HRESULT CreateBitmapFromTexture(ID2D1RenderTarget* pRenderTarget, const wchar_t* filePath, ID2D1Bitmap** ppBitmap);
 
     static ID2D1Bitmap* pPawnBitmap_w;
     static ID2D1Bitmap* pPawnBitmap_b;
@@ -94,6 +94,7 @@ static std::vector<ChessTile> validTiles;
 
 static std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard& board);
 static std::vector<ChessTile> getValidKnightMove(const ChessTile& currentTile, ChessBoard& board);
+static std::vector<ChessTile> getValidRookMove(const ChessTile& currentTile, ChessBoard& b1);
 
 std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard& b1)
 {
@@ -141,6 +142,56 @@ std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard
 std::vector<ChessTile> getValidKnightMove(const ChessTile& currentTile, ChessBoard& b1) 
 {
     validTiles.clear();
+
+    int directionRow[] = { 2, 1, -1, -2, -2, -1, 1, 2 };
+    int directionCol[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
+
+    if (currentTile.piece->team == TileTeam::WHITE) 
+    {
+        OutputDebugString(L"Calculating valid moves for white knight....\n");
+        std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
+            L" Y: " + std::to_wstring(currentTile.row) + L"\n";
+
+        OutputDebugString(str.c_str());
+
+        for (size_t i = 0; i < 8; i++)
+        {
+            int destRow = currentTile.row + directionRow[i];
+            int destCol = currentTile.col + directionCol[i];
+
+            if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+                validTiles.push_back(b1.tile[destCol][destRow]);
+            }
+        }
+    }
+    return validTiles;
+}
+
+
+std::vector<ChessTile> getValidRookMove(const ChessTile& currentTile, ChessBoard& b1) 
+{
+    validTiles.clear();
+
+    int directionRow[] = { -1, 1, 0, 0 };
+    int directionCol[] = { 0, 0, -1, 1 };
+
+    if (currentTile.piece->team == TileTeam::WHITE)
+    {
+        OutputDebugString(L"Calculating valid moves for white rook....\n");
+        std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
+            L" Y: " + std::to_wstring(currentTile.row) + L"\n";
+
+
+        for (size_t i = 0; i < 4; i++)
+        {
+            int destRow = currentTile.row + directionRow[i];
+            int destCol = currentTile.col + directionCol[i];
+
+            if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+                validTiles.push_back(b1.tile[destCol][destRow]);
+            }
+        }
+    }
 
     return validTiles;
 }

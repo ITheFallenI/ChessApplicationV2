@@ -183,83 +183,18 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
         }
     }
 
-    wchar_t buffer[MAX_PATH];
-    GetModuleFileName(GetModuleHandle(NULL), buffer, MAX_PATH);
 
-    // Extract the path from the buffer
-    wchar_t* lastBackslash = wcsrchr(buffer, L'\\');
-    if (lastBackslash != NULL) {
-        *lastBackslash = L'\0'; // Null-terminate the string at the last backslash
-    }
+    OutputDebugStringW(L"Loading all textures.\n");
 
+    LoadTexture(L"\\img\\pawn_w.png", &ChessBoard::pPawnBitmap_w);
+    LoadTexture(L"\\img\\pawn_b.png", &ChessBoard::pPawnBitmap_b);
 
-    wchar_t pawnTest_w_imagePath[MAX_PATH];
-    wcscpy_s(pawnTest_w_imagePath, MAX_PATH, buffer);
-    wcscat_s(pawnTest_w_imagePath, MAX_PATH, L"\\img\\pawn_w.png");
-    HRESULT hr1 = ChessBoard::LoadChessPieceTexture(renderTarget, pawnTest_w_imagePath, &ChessBoard::pPawnBitmap_w);
+    LoadTexture(L"\\img\\knight_w.png", &ChessBoard::pKnightBitmap_w);
+    LoadTexture(L"\\img\\knight_b.png", &ChessBoard::pKnightBitmap_b);
 
-    if (SUCCEEDED(hr1))
-    {
-        // Successfully loaded the white pawn bitmap
-        OutputDebugStringW(L"pawn_w.png success!\n");
-    }
-    else
-    {
-        OutputDebugStringW(L"pawn_w.png failed! \n");
-        // Failed to load the white pawn bitmap
-    }
+    OutputDebugStringW(L"Textures loaded..\n");
 
-    //Window32app::LoadTexturePiece(L"\\img\\pawn_b.png", &ChessBoard::pPawnBitmap_b);
-    wchar_t pawnTest_b_imagePath[MAX_PATH];
-    wcscpy_s(pawnTest_b_imagePath, MAX_PATH, buffer);
-    wcscat_s(pawnTest_b_imagePath, MAX_PATH, L"\\img\\pawn_b.png");
-    HRESULT hr2 = ChessBoard::LoadChessPieceTexture(renderTarget, pawnTest_b_imagePath, &ChessBoard::pPawnBitmap_b);
-
-    if (SUCCEEDED(hr2))
-    {
-        // Successfully loaded the white pawn bitmap
-        OutputDebugStringW(L"pawn_b.png success! \n");
-    }
-    else
-    {
-        OutputDebugStringW(L"pawn_b.png failed! \n");
-        // Failed to load the white pawn bitmap
-    }
-
-
-    wchar_t knight_b_imagePath[MAX_PATH];
-    wcscpy_s(knight_b_imagePath, MAX_PATH, buffer);
-    wcscat_s(knight_b_imagePath, MAX_PATH, L"\\img\\knight_b.png");
-    HRESULT hr3 = ChessBoard::LoadChessPieceTexture(renderTarget, knight_b_imagePath, &ChessBoard::pKnightBitmap_b);
-
-    if (SUCCEEDED(hr3))
-    {
-        // Successfully loaded the white pawn bitmap
-        OutputDebugStringW(L"knight_b.png success! \n");
-    }
-    else
-    {
-        OutputDebugStringW(L"knight_b.png failed! \n");
-        // Failed to load the white pawn bitmap
-    }
-
-    wchar_t knight_w_imagePath[MAX_PATH];
-    wcscpy_s(knight_w_imagePath, MAX_PATH, buffer);
-    wcscat_s(knight_w_imagePath, MAX_PATH, L"\\img\\knight_w.png");
-    HRESULT hr4 = ChessBoard::LoadChessPieceTexture(renderTarget, knight_w_imagePath, &ChessBoard::pKnightBitmap_w);
-
-    if (SUCCEEDED(hr4))
-    {
-        // Successfully loaded the white pawn bitmap
-        OutputDebugStringW(L"knight_w.png success! \n");
-    }
-    else
-    {
-        OutputDebugStringW(L"knight_w.png failed! \n");
-        // Failed to load the white pawn bitmap
-    }
-
-
+    OutputDebugStringW(L"Adding pieces to board.\n");
     AddDefaultBoard();
 
     return S_OK;
@@ -293,6 +228,10 @@ void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                         else if (tile.piece->type == TileType::KNIGHT) {
                             OutputDebugStringW(L"we're a knight, get valid knight moves.\n");
                             validTiles = getValidKnightMove(tile, board);
+                        }
+                        else if (tile.piece->type == TileType::ROOK) {
+                            OutputDebugStringW(L"we're a ROOK, get valid ROOK moves.\n");
+                            validTiles = getValidRookMove(tile, board);
                         }
                         else {
                             validTiles.clear();
@@ -473,7 +412,6 @@ void Window32app::AddDefaultBoard()
     newP->bitmap = ChessBoard::pPawnBitmap_w;
     newP->col = 1;
     newP->row = 0;
-    newP->tileSize = 60;
 
     board.tile[newP->col][newP->row].piece = newP;
 
@@ -485,7 +423,6 @@ void Window32app::AddDefaultBoard()
     newP2->bitmap = ChessBoard::pPawnBitmap_w;
     newP2->col = 4;
     newP2->row = 3;
-    newP2->tileSize = 60;
 
     board.tile[newP2->col][newP2->row].piece = newP2;
 
@@ -497,7 +434,6 @@ void Window32app::AddDefaultBoard()
     newK1->bitmap = ChessBoard::pKnightBitmap_w;
     newK1->col = 5;
     newK1->row = 5;
-    newK1->tileSize = 60;
 
     board.tile[newK1->col][newK1->row].piece = newK1;
 
@@ -510,7 +446,6 @@ void Window32app::AddDefaultBoard()
     newP_b->bitmap = ChessBoard::pPawnBitmap_b;
     newP_b->col = 1;
     newP_b->row = 6;
-    newP_b->tileSize = 60;
 
 
     board.tile[newP_b->col][newP_b->row].piece = newP_b;
@@ -523,7 +458,6 @@ void Window32app::AddDefaultBoard()
     newP_b2->bitmap = ChessBoard::pPawnBitmap_b;
     newP_b2->col = 2;
     newP_b2->row = 6;
-    newP_b2->tileSize = 60;
 
 
     board.tile[newP_b2->col][newP_b2->row].piece = newP_b2;
@@ -541,29 +475,7 @@ void Window32app::DeleteAllPieces()
         }
     }
 }
-/*
-void Window32app::LoadTexturePiece(std::wstring pngFile, ID2D1Bitmap** ppBitmap) {
 
-    wchar_t buffer[MAX_PATH];
-    GetModuleFileName(GetModuleHandle(NULL), buffer, MAX_PATH);
-
-    wchar_t pawnTest_b_imagePath[MAX_PATH];
-    wcscpy_s(pawnTest_b_imagePath, MAX_PATH, buffer);
-    wcscat_s(pawnTest_b_imagePath, MAX_PATH, pngFile.c_str());
-    HRESULT hr2 = ChessBoard::LoadChessPieceTexture(renderTarget, pawnTest_b_imagePath, ppBitmap);
-
-    if (SUCCEEDED(hr2))
-    {
-        // Successfully loaded the white pawn bitmap
-        OutputDebugStringW(L"success! \n");
-    }
-    else
-    {
-        OutputDebugStringW(L"failed! \n");
-        // Failed to load the white pawn bitmap
-    }
-}
-*/
 void Window32app::RenderBoard()
 {
     if (!renderTarget)
@@ -702,5 +614,43 @@ void Window32app::RenderBoard()
 
     // End drawing
         renderTarget->EndDraw();
+    }
+}
+
+
+void Window32app::LoadTexture(std::wstring textureName, ID2D1Bitmap** ppBitmap)
+{
+    wchar_t buffer[MAX_PATH];
+    GetModuleFileName(GetModuleHandle(NULL), buffer, MAX_PATH);
+
+    // Find the last backslash in the buffer (before the executable name)
+    wchar_t* lastBackslash = wcsrchr(buffer, L'\\');
+
+    if (lastBackslash != NULL) {
+        *(lastBackslash + 1) = L'\0'; // Null-terminate the string after the last backslash
+    }
+
+    // Create a new buffer to store the full file path
+    wchar_t knight_w_imagePath[MAX_PATH];
+    wcscpy_s(knight_w_imagePath, MAX_PATH, buffer);
+
+    // Concatenate the directory path with the image file name
+    wcscat_s(knight_w_imagePath, MAX_PATH, textureName.c_str());
+
+    OutputDebugStringW(knight_w_imagePath);
+    OutputDebugStringW(L"\n");
+
+    HRESULT hr4 = ChessBoard::CreateBitmapFromTexture(renderTarget, knight_w_imagePath, ppBitmap);
+
+    if (SUCCEEDED(hr4))
+    {
+        // Successfully loaded the white pawn bitmap
+        std::wstring suc = L"(" + textureName + L" ) success! \n";
+        OutputDebugStringW(suc.c_str());
+    }
+    else
+    {
+        std::wstring fal = L"(" + textureName + L" ) failed! \n";
+        OutputDebugStringW(fal.c_str());
     }
 }
