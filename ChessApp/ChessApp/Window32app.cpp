@@ -110,8 +110,8 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     {
         // Limit the minimum size of the window
         MINMAXINFO* pMinMaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
-        pMinMaxInfo->ptMinTrackSize.x = Window32app::minWinSize.x; // Set your desired minimum width
-        pMinMaxInfo->ptMinTrackSize.y = Window32app::minWinSize.y; // Set your desired minimum height
+        pMinMaxInfo->ptMinTrackSize.x = Window32app::minWinSize.x; // min 1280
+        pMinMaxInfo->ptMinTrackSize.y = Window32app::minWinSize.y; // min 720
         return 0;
     }
     case WM_SIZE:
@@ -197,6 +197,12 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
     LoadTexture(L"\\img\\bishop_w.png", &ChessBoard::pBishopBitmap_w);
     LoadTexture(L"\\img\\bishop_b.png", &ChessBoard::pBishopBitmap_b);
 
+    LoadTexture(L"\\img\\queen_w.png", &ChessBoard::pQueenBitmap_w);
+    LoadTexture(L"\\img\\queen_b.png", &ChessBoard::pQueenBitmap_b);
+
+    LoadTexture(L"\\img\\king_w.png", &ChessBoard::pKingBitmap_w);
+    LoadTexture(L"\\img\\king_b.png", &ChessBoard::pKingBitmap_b);
+
     OutputDebugStringW(L"Textures loaded..\n");
 
     OutputDebugStringW(L"Adding pieces to board.\n");
@@ -228,15 +234,33 @@ void Window32app::LeftMouseDown(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
                         if (tile.piece->type == TileType::PAWN) {
                             OutputDebugStringW(L"we're a pawn, get valid pawn moves.\n");
                             //we're a pawn check for valid pawn moves..
+                            validTiles.clear();
                             validTiles = getValidPawnMove(tile, board);
                         }
                         else if (tile.piece->type == TileType::KNIGHT) {
                             OutputDebugStringW(L"we're a knight, get valid knight moves.\n");
+                            validTiles.clear();
                             validTiles = getValidKnightMove(tile, board);
                         }
                         else if (tile.piece->type == TileType::ROOK) {
                             OutputDebugStringW(L"we're a ROOK, get valid ROOK moves.\n");
+                            validTiles.clear();
                             validTiles = getValidRookMove(tile, board);
+                        }
+                        else if (tile.piece->type == TileType::BISHOP) {
+                            OutputDebugStringW(L"we're a BISHOP, get valid BISHOP moves.\n");
+                            validTiles.clear();
+                            validTiles = getValidBishopMove(tile, board);
+                        }
+                        else if (tile.piece->type == TileType::QUEEN) {
+                            OutputDebugStringW(L"we're a QUEEN, get valid QUEEN moves.\n");
+                            validTiles.clear();
+                            validTiles = getValidQueenMove(tile, board);
+                        }
+                        else if (tile.piece->type == TileType::KING) {
+                            OutputDebugStringW(L"we're a KING, get valid KING moves.\n");
+                            validTiles.clear();
+                            validTiles = getValidKingMove(tile, board);
                         }
                         else {
                             validTiles.clear();
@@ -300,19 +324,25 @@ void Window32app::LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
                     else if (dragging && draggablePiece && tile.piece) {
                         //has a piece on slot
                         OutputDebugStringW(L"Placed on valid tile but it has a piece, lets take it?.\n\n");
-                        draggablePiece->col = tile.col;
-                        draggablePiece->row = tile.row;
+                        if (tile.piece->type != TileType::KING) {
+                            draggablePiece->col = tile.col;
+                            draggablePiece->row = tile.row;
 
-                        selectedtileCol = tile.col;
-                        selectedtileRow = tile.row;
+                            selectedtileCol = tile.col;
+                            selectedtileRow = tile.row;
 
-                         //should check here is takeable really
-                        delete tile.piece;
-                        tile.piece = nullptr;
-                        tile.piece = draggablePiece;
-                        draggablePiece = nullptr;
-                        dragging = false;
-                        validTiles.clear();
+                            //delete the piece
+                            delete tile.piece;
+                            tile.piece = nullptr;
+                            tile.piece = draggablePiece;
+                            draggablePiece = nullptr;
+                            dragging = false;
+                            OutputDebugStringW(L"yoinked the piece!\n");
+                            validTiles.clear();
+                        }
+                        else {
+                            OutputDebugStringW(L"can't take the king!!\n");
+                        }
 
                     }
                 }else{
@@ -338,8 +368,7 @@ void Window32app::LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
     }
 }
 
-
-
+// Clean up all pointers, brushes, texture, etc
 void Window32app::CleanUp()
 {
     for (int row = 0; row < board.GetRows(); row++)
@@ -369,6 +398,67 @@ void Window32app::CleanUp()
         ChessBoard::pPawnBitmap_b = nullptr;
     }
 
+    if (ChessBoard::pKnightBitmap_w)
+    {
+        ChessBoard::pKnightBitmap_w->Release();
+        ChessBoard::pKnightBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pKnightBitmap_b)
+    {
+        ChessBoard::pKnightBitmap_b->Release();
+        ChessBoard::pKnightBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pRookBitmap_w)
+    {
+        ChessBoard::pRookBitmap_w->Release();
+        ChessBoard::pRookBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pRookBitmap_b)
+    {
+        ChessBoard::pRookBitmap_b->Release();
+        ChessBoard::pRookBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pBishopBitmap_w)
+    {
+        ChessBoard::pBishopBitmap_w->Release();
+        ChessBoard::pBishopBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pBishopBitmap_b)
+    {
+        ChessBoard::pBishopBitmap_b->Release();
+        ChessBoard::pBishopBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pQueenBitmap_w)
+    {
+        ChessBoard::pQueenBitmap_w->Release();
+        ChessBoard::pQueenBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pQueenBitmap_b)
+    {
+        ChessBoard::pQueenBitmap_b->Release();
+        ChessBoard::pQueenBitmap_b = nullptr;
+    }
+
+
+    if (ChessBoard::pKingBitmap_w)
+    {
+        ChessBoard::pKingBitmap_w->Release();
+        ChessBoard::pKingBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pKingBitmap_b)
+    {
+        ChessBoard::pKingBitmap_b->Release();
+        ChessBoard::pKingBitmap_b = nullptr;
+    }
+
     OutputDebugStringW(L"Cleanup all textures.\n");
 
     for (int row = board.GetRows() - 1; row >= 0; row--)
@@ -393,7 +483,6 @@ void Window32app::CleanUp()
     OutputDebugStringW(L"Cleanup all piece pointers.\n");
 }
 
-
 // Function to draw a bitmap at a specific position on the render target
 void Window32app::DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitmap, int x, int y, float width, float height)
 {
@@ -410,7 +499,7 @@ void Window32app::DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitma
 
 void Window32app::AddDefaultBoard() 
 {
-    
+    /*
     //white
     AddPieceToBoard(0, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
     AddPieceToBoard(1, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
@@ -420,7 +509,7 @@ void Window32app::AddDefaultBoard()
     AddPieceToBoard(5, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
     AddPieceToBoard(6, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
     AddPieceToBoard(7, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
-
+    */
     //hprses
     AddPieceToBoard(1, 0, TileTeam::WHITE, TileType::KNIGHT, ChessBoard::pKnightBitmap_w);
     AddPieceToBoard(6, 0, TileTeam::WHITE, TileType::KNIGHT, ChessBoard::pKnightBitmap_w);
@@ -433,6 +522,13 @@ void Window32app::AddDefaultBoard()
     AddPieceToBoard(7, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
     AddPieceToBoard(0, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
 
+    //queen
+    AddPieceToBoard(3, 0, TileTeam::WHITE, TileType::QUEEN, ChessBoard::pQueenBitmap_w);
+
+    //king
+    AddPieceToBoard(4, 0, TileTeam::WHITE, TileType::KING, ChessBoard::pKingBitmap_w);
+
+    /*
     //black
     AddPieceToBoard(0,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
     AddPieceToBoard(1,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
@@ -442,7 +538,7 @@ void Window32app::AddDefaultBoard()
     AddPieceToBoard(5,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
     AddPieceToBoard(6,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
     AddPieceToBoard(7,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
-
+    */
     //hprses
     AddPieceToBoard(1, 7, TileTeam::BLACK, TileType::KNIGHT, ChessBoard::pKnightBitmap_b);
     AddPieceToBoard(6, 7, TileTeam::BLACK, TileType::KNIGHT, ChessBoard::pKnightBitmap_b);
@@ -455,8 +551,12 @@ void Window32app::AddDefaultBoard()
     AddPieceToBoard(7, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
     AddPieceToBoard(0, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
 
-}
+    //queen
+    AddPieceToBoard(3, 7, TileTeam::BLACK, TileType::QUEEN, ChessBoard::pQueenBitmap_b);
 
+    //king
+    AddPieceToBoard(4, 7, TileTeam::BLACK, TileType::KING, ChessBoard::pKingBitmap_b);
+}
 
 void Window32app::DeleteAllPieces()
 {

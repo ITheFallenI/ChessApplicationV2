@@ -13,6 +13,12 @@ ID2D1Bitmap* ChessBoard::pRookBitmap_b = nullptr;
 ID2D1Bitmap* ChessBoard::pBishopBitmap_w = nullptr;
 ID2D1Bitmap* ChessBoard::pBishopBitmap_b = nullptr;
 
+ID2D1Bitmap* ChessBoard::pQueenBitmap_w = nullptr;
+ID2D1Bitmap* ChessBoard::pQueenBitmap_b = nullptr;
+
+ID2D1Bitmap* ChessBoard::pKingBitmap_w = nullptr;
+ID2D1Bitmap* ChessBoard::pKingBitmap_b = nullptr;
+
 // Overload the << operator for PieceType enum
 std::ostream& operator<<(std::ostream& os, const TileType& pieceType)
 {
@@ -75,7 +81,6 @@ ChessBoard::ChessBoard()
             tile[col][row].col = col;
             tile[col][row].row = row;
             tile[col][row].pBrush = nullptr;
-            tile[col][row].defaultColor = genColor;
             tile[col][row].currentColor = genColor;
 
 		}
