@@ -183,7 +183,6 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
         }
     }
 
-
     OutputDebugStringW(L"Loading all textures.\n");
 
     LoadTexture(L"\\img\\pawn_w.png", &ChessBoard::pPawnBitmap_w);
@@ -522,32 +521,26 @@ void Window32app::RenderBoard()
                 renderTarget->FillRectangle(D2D1::RectF(x, y, x + tileSize, y + tileSize), tile.pBrush);
             }
         }
+        //debug selected tile
+        auto& tile = board.tile[selectedtileCol][selectedtileRow];
+        if (tile.col == board.tile[selectedtileCol][selectedtileRow].col && tile.row == board.tile[selectedtileCol][selectedtileRow].row && selectedtileRow >= 0 && selectedtileCol >= 0) {
 
-        //valid tiles render.
-        for (const ChessTile& tile : validTiles) {
-            // Calculate the center of the tile
-            int col = tile.col;
-            int y = tile.row;
-            ChessTile tileOnBoard = board.tile[col][y];
-            float centerX = (tileOnBoard.polygon.x0 + tileOnBoard.polygon.x1 + tileOnBoard.polygon.x2 + tileOnBoard.polygon.x3) / 4.0f;
-            float centerY = (tileOnBoard.polygon.y0 + tileOnBoard.polygon.y1 + tileOnBoard.polygon.y2 + tileOnBoard.polygon.y3) / 4.0f;
+            // Create a solid color brush for the dots
+            ID2D1SolidColorBrush* dotBrush = nullptr;
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(1, 0.93, 0.53, 1), &dotBrush);
+            if (FAILED(hr))
+            {
+                // Handle the error if necessary
+            }
 
-            // Create the ellipse centered at the tile's center
-            ID2D1SolidColorBrush* test = nullptr;
-            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0.250f, 1.0f, 0.25f, 0.5f), &test);
-            D2D1_ELLIPSE dec;
-            float dotRadius = tileSize / 5; // Adjust the dot radius as needed (smaller value for smaller dots)
 
-            dec.point = D2D1::Point2F(centerX, centerY);
-            dec.radiusX = dec.radiusY = dotRadius;
-
-            // Draw the ellipse on the valid tile
-            renderTarget->FillEllipse(dec, test);
+            renderTarget->FillRectangle(D2D1::RectF(tile.polygon.x0, tile.polygon.y0, tile.polygon.x0 + tileSize, tile.polygon.y0 + tileSize), dotBrush);
 
             // Release the dot brush after use
-            test->Release();
-            test = nullptr;
+            dotBrush->Release();
+            dotBrush = nullptr;
         }
+
         //pieces
         for (int row = 0; row < board.GetRows(); row++)
         {
@@ -567,43 +560,30 @@ void Window32app::RenderBoard()
             renderTarget->DrawBitmap(draggablePiece->bitmap, destRect);
         }
 
+        //valid tiles render.
+        for (const ChessTile& tile : validTiles) {
+            // Calculate the center of the tile
+            int col = tile.col;
+            int y = tile.row;
+            ChessTile tileOnBoard = board.tile[col][y];
+            float centerX = (tileOnBoard.polygon.x0 + tileOnBoard.polygon.x1 + tileOnBoard.polygon.x2 + tileOnBoard.polygon.x3) / 4.0f;
+            float centerY = (tileOnBoard.polygon.y0 + tileOnBoard.polygon.y1 + tileOnBoard.polygon.y2 + tileOnBoard.polygon.y3) / 4.0f;
 
-        //debug selected tile
-        auto& tile = board.tile[selectedtileCol][selectedtileRow];
-        if (tile.col == board.tile[selectedtileCol][selectedtileRow].col && tile.row == board.tile[selectedtileCol][selectedtileRow].row && selectedtileRow >= 0 && selectedtileCol >= 0) {
+            // Create the ellipse centered at the tile's center
+            ID2D1SolidColorBrush* test = nullptr;
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0.250f, 1.0f, 0.25f, 0.5f), &test);
+            D2D1_ELLIPSE dec;
+            float dotRadius = tileSize / 8; // Adjust the dot radius as needed (smaller value for smaller dots)
 
-            // Create a solid color brush for the dots
-            ID2D1SolidColorBrush* dotBrush = nullptr;
-            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(1.0f, 0.9f, 0), &dotBrush);
-            if (FAILED(hr))
-            {
-                // Handle the error if necessary
-            }
+            dec.point = D2D1::Point2F(centerX, centerY);
+            dec.radiusX = dec.radiusY = dotRadius;
 
-            // Draw four dots for each point of the tile polygon
-            D2D1_ELLIPSE dotEllipse;
-            float dotRadius = tileSize / 10; // Adjust the dot radius as needed
-
-            // Draw dot for point (x0, y0)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
-            dotEllipse.radiusX = dotEllipse.radiusY = dotRadius;
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x1, y1)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x1, tile.polygon.y1);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x2, y2)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x2, tile.polygon.y2);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x3, y3)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x3, tile.polygon.y3);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
+            // Draw the ellipse on the valid tile
+            renderTarget->FillEllipse(dec, test);
 
             // Release the dot brush after use
-            dotBrush->Release();
-            dotBrush = nullptr;
+            test->Release();
+            test = nullptr;
         }
 
     // End drawing
