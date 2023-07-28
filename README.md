@@ -8,4 +8,4 @@ I want to remake chess, then maybe for my 3rd-year degree project, program AI bo
 Any help or advice to me is appreciated. 
 
 
-![Chess Board](https://i.imgur.com/D4xZUuC.gif)
+![Chess Board](https://i.imgur.com/jgrMV9O.gif)
