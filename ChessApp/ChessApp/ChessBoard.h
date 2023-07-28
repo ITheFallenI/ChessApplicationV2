@@ -48,7 +48,6 @@ struct ChessPiece {
 struct ChessTile
 {
     TilePolygon polygon;
-    D2D1_COLOR_F defaultColor;
     D2D1_COLOR_F currentColor;
     ID2D1SolidColorBrush* pBrush = nullptr;
 
@@ -93,13 +92,19 @@ public:
 
     static ID2D1Bitmap* pBishopBitmap_w;
     static ID2D1Bitmap* pBishopBitmap_b;
+
+    static ID2D1Bitmap* pQueenBitmap_w;
+    static ID2D1Bitmap* pQueenBitmap_b;
+
+    static ID2D1Bitmap* pKingBitmap_w;
+    static ID2D1Bitmap* pKingBitmap_b;
 };
 
 
 static std::vector<ChessTile> validTiles;
 
-static std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard& board);
-static std::vector<ChessTile> getValidKnightMove(const ChessTile& currentTile, ChessBoard& board);
+static std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard& b1);
+static std::vector<ChessTile> getValidKnightMove(const ChessTile& currentTile, ChessBoard& b1);
 static std::vector<ChessTile> getValidRookMove(const ChessTile& currentTile, ChessBoard& b1);
 
 std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard& b1)

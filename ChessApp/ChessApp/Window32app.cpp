@@ -110,8 +110,8 @@ LRESULT Window32app::WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPar
     {
         // Limit the minimum size of the window
         MINMAXINFO* pMinMaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
-        pMinMaxInfo->ptMinTrackSize.x = Window32app::minWinSize.x; // Set your desired minimum width
-        pMinMaxInfo->ptMinTrackSize.y = Window32app::minWinSize.y; // Set your desired minimum height
+        pMinMaxInfo->ptMinTrackSize.x = Window32app::minWinSize.x; // min 1280
+        pMinMaxInfo->ptMinTrackSize.y = Window32app::minWinSize.y; // min 720
         return 0;
     }
     case WM_SIZE:
@@ -196,6 +196,12 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
 
     LoadTexture(L"\\img\\bishop_w.png", &ChessBoard::pBishopBitmap_w);
     LoadTexture(L"\\img\\bishop_b.png", &ChessBoard::pBishopBitmap_b);
+
+    LoadTexture(L"\\img\\queen_w.png", &ChessBoard::pQueenBitmap_w);
+    LoadTexture(L"\\img\\queen_b.png", &ChessBoard::pQueenBitmap_b);
+
+    LoadTexture(L"\\img\\king_w.png", &ChessBoard::pKingBitmap_w);
+    LoadTexture(L"\\img\\king_b.png", &ChessBoard::pKingBitmap_b);
 
     OutputDebugStringW(L"Textures loaded..\n");
 
@@ -306,7 +312,7 @@ void Window32app::LeftMouseUp(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam
                         selectedtileCol = tile.col;
                         selectedtileRow = tile.row;
 
-                         //should check here is takeable really
+                         //delete the piece
                         delete tile.piece;
                         tile.piece = nullptr;
                         tile.piece = draggablePiece;
@@ -367,6 +373,67 @@ void Window32app::CleanUp()
     {
         ChessBoard::pPawnBitmap_b->Release();
         ChessBoard::pPawnBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pKnightBitmap_w)
+    {
+        ChessBoard::pKnightBitmap_w->Release();
+        ChessBoard::pKnightBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pKnightBitmap_b)
+    {
+        ChessBoard::pKnightBitmap_b->Release();
+        ChessBoard::pKnightBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pRookBitmap_w)
+    {
+        ChessBoard::pRookBitmap_w->Release();
+        ChessBoard::pRookBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pRookBitmap_b)
+    {
+        ChessBoard::pRookBitmap_b->Release();
+        ChessBoard::pRookBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pBishopBitmap_w)
+    {
+        ChessBoard::pBishopBitmap_w->Release();
+        ChessBoard::pBishopBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pBishopBitmap_b)
+    {
+        ChessBoard::pBishopBitmap_b->Release();
+        ChessBoard::pBishopBitmap_b = nullptr;
+    }
+
+    if (ChessBoard::pQueenBitmap_w)
+    {
+        ChessBoard::pQueenBitmap_w->Release();
+        ChessBoard::pQueenBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pQueenBitmap_b)
+    {
+        ChessBoard::pQueenBitmap_b->Release();
+        ChessBoard::pQueenBitmap_b = nullptr;
+    }
+
+
+    if (ChessBoard::pKingBitmap_w)
+    {
+        ChessBoard::pKingBitmap_w->Release();
+        ChessBoard::pKingBitmap_w = nullptr;
+    }
+
+    if (ChessBoard::pKingBitmap_b)
+    {
+        ChessBoard::pKingBitmap_b->Release();
+        ChessBoard::pKingBitmap_b = nullptr;
     }
 
     OutputDebugStringW(L"Cleanup all textures.\n");
@@ -433,6 +500,13 @@ void Window32app::AddDefaultBoard()
     AddPieceToBoard(7, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
     AddPieceToBoard(0, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
 
+    //queen
+    AddPieceToBoard(3, 0, TileTeam::WHITE, TileType::QUEEN, ChessBoard::pQueenBitmap_w);
+
+    //king
+    AddPieceToBoard(4, 0, TileTeam::WHITE, TileType::KING, ChessBoard::pKingBitmap_w);
+
+
     //black
     AddPieceToBoard(0,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
     AddPieceToBoard(1,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
@@ -455,6 +529,11 @@ void Window32app::AddDefaultBoard()
     AddPieceToBoard(7, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
     AddPieceToBoard(0, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
 
+    //queen
+    AddPieceToBoard(3, 7, TileTeam::BLACK, TileType::QUEEN, ChessBoard::pQueenBitmap_b);
+
+    //king
+    AddPieceToBoard(4, 7, TileTeam::BLACK, TileType::KING, ChessBoard::pKingBitmap_b);
 }
 
 
