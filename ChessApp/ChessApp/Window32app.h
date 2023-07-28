@@ -27,5 +27,7 @@ private:
 	static void DeleteAllPieces();
 
 	static void LoadTexture(std::wstring textureName, ID2D1Bitmap** ppBitmap);
+
+	static void AddPieceToBoard(int m_col, int m_row, TileTeam m_team, TileType m_type, ID2D1Bitmap* m_bitmap);
 };
 

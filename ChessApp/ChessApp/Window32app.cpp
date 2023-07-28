@@ -183,7 +183,6 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
         }
     }
 
-
     OutputDebugStringW(L"Loading all textures.\n");
 
     LoadTexture(L"\\img\\pawn_w.png", &ChessBoard::pPawnBitmap_w);
@@ -191,6 +190,12 @@ HRESULT Window32app::DirectXsetup(HWND hwnd)
 
     LoadTexture(L"\\img\\knight_w.png", &ChessBoard::pKnightBitmap_w);
     LoadTexture(L"\\img\\knight_b.png", &ChessBoard::pKnightBitmap_b);
+
+    LoadTexture(L"\\img\\rook_w.png", &ChessBoard::pRookBitmap_w);
+    LoadTexture(L"\\img\\rook_b.png", &ChessBoard::pRookBitmap_b);
+
+    LoadTexture(L"\\img\\bishop_w.png", &ChessBoard::pBishopBitmap_w);
+    LoadTexture(L"\\img\\bishop_b.png", &ChessBoard::pBishopBitmap_b);
 
     OutputDebugStringW(L"Textures loaded..\n");
 
@@ -405,62 +410,51 @@ void Window32app::DrawBitmap(ID2D1RenderTarget* renderTarget, ID2D1Bitmap* bitma
 
 void Window32app::AddDefaultBoard() 
 {
-    ChessPiece* newP = new ChessPiece;
+    
+    //white
+    AddPieceToBoard(0, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(1, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(2, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(3, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(4, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(5, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(6, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
+    AddPieceToBoard(7, 1, TileTeam::WHITE, TileType::PAWN, ChessBoard::pPawnBitmap_w);
 
-    newP->team = TileTeam::WHITE;
-    newP->type = TileType::PAWN;
-    newP->bitmap = ChessBoard::pPawnBitmap_w;
-    newP->col = 1;
-    newP->row = 0;
+    //hprses
+    AddPieceToBoard(1, 0, TileTeam::WHITE, TileType::KNIGHT, ChessBoard::pKnightBitmap_w);
+    AddPieceToBoard(6, 0, TileTeam::WHITE, TileType::KNIGHT, ChessBoard::pKnightBitmap_w);
 
-    board.tile[newP->col][newP->row].piece = newP;
+    //bishop
+    AddPieceToBoard(2, 0, TileTeam::WHITE, TileType::BISHOP, ChessBoard::pBishopBitmap_w);
+    AddPieceToBoard(5, 0, TileTeam::WHITE, TileType::BISHOP, ChessBoard::pBishopBitmap_w);
 
-
-    ChessPiece* newP2 = new ChessPiece;
-
-    newP2->team = TileTeam::WHITE;
-    newP2->type = TileType::PAWN;
-    newP2->bitmap = ChessBoard::pPawnBitmap_w;
-    newP2->col = 4;
-    newP2->row = 3;
-
-    board.tile[newP2->col][newP2->row].piece = newP2;
-
-
-    ChessPiece* newK1 = new ChessPiece;
-
-    newK1->team = TileTeam::WHITE;
-    newK1->type = TileType::KNIGHT;
-    newK1->bitmap = ChessBoard::pKnightBitmap_w;
-    newK1->col = 5;
-    newK1->row = 5;
-
-    board.tile[newK1->col][newK1->row].piece = newK1;
-
+    //rooks
+    AddPieceToBoard(7, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
+    AddPieceToBoard(0, 0, TileTeam::WHITE, TileType::ROOK, ChessBoard::pRookBitmap_w);
 
     //black
-    ChessPiece* newP_b = new ChessPiece;
+    AddPieceToBoard(0,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(1,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(2,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(3,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(4,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(5,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(6,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
+    AddPieceToBoard(7,6,TileTeam::BLACK, TileType::PAWN, ChessBoard::pPawnBitmap_b);
 
-    newP_b->team = TileTeam::BLACK;
-    newP_b->type = TileType::PAWN;
-    newP_b->bitmap = ChessBoard::pPawnBitmap_b;
-    newP_b->col = 1;
-    newP_b->row = 6;
+    //hprses
+    AddPieceToBoard(1, 7, TileTeam::BLACK, TileType::KNIGHT, ChessBoard::pKnightBitmap_b);
+    AddPieceToBoard(6, 7, TileTeam::BLACK, TileType::KNIGHT, ChessBoard::pKnightBitmap_b);
 
+    //bishop
+    AddPieceToBoard(2, 7, TileTeam::BLACK, TileType::BISHOP, ChessBoard::pBishopBitmap_b);
+    AddPieceToBoard(5, 7, TileTeam::BLACK, TileType::BISHOP, ChessBoard::pBishopBitmap_b);
 
-    board.tile[newP_b->col][newP_b->row].piece = newP_b;
+    //rooks
+    AddPieceToBoard(7, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
+    AddPieceToBoard(0, 7, TileTeam::BLACK, TileType::ROOK, ChessBoard::pRookBitmap_b);
 
-
-    ChessPiece* newP_b2 = new ChessPiece;
-
-    newP_b2->team = TileTeam::BLACK;
-    newP_b2->type = TileType::PAWN;
-    newP_b2->bitmap = ChessBoard::pPawnBitmap_b;
-    newP_b2->col = 2;
-    newP_b2->row = 6;
-
-
-    board.tile[newP_b2->col][newP_b2->row].piece = newP_b2;
 }
 
 
@@ -527,71 +521,25 @@ void Window32app::RenderBoard()
                 renderTarget->FillRectangle(D2D1::RectF(x, y, x + tileSize, y + tileSize), tile.pBrush);
             }
         }
-
-        //valid tiles render.
-        for (const ChessTile& tile : validTiles) {
-            // Calculate the center of the tile
-            int col = tile.col;
-            int y = tile.row;
-            ChessTile tileOnBoard = board.tile[col][y];
-            float centerX = (tileOnBoard.polygon.x0 + tileOnBoard.polygon.x1 + tileOnBoard.polygon.x2 + tileOnBoard.polygon.x3) / 4.0f;
-            float centerY = (tileOnBoard.polygon.y0 + tileOnBoard.polygon.y1 + tileOnBoard.polygon.y2 + tileOnBoard.polygon.y3) / 4.0f;
-
-            // Create the ellipse centered at the tile's center
-            ID2D1SolidColorBrush* test = nullptr;
-            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0.250f, 1.0f, 0.25f, 0.5f), &test);
-            D2D1_ELLIPSE dec;
-            float dotRadius = tileSize / 5; // Adjust the dot radius as needed (smaller value for smaller dots)
-
-            dec.point = D2D1::Point2F(centerX, centerY);
-            dec.radiusX = dec.radiusY = dotRadius;
-
-            // Draw the ellipse on the valid tile
-            renderTarget->FillEllipse(dec, test);
-
-            // Release the dot brush after use
-            test->Release();
-            test = nullptr;
-        }
-
         //debug selected tile
         auto& tile = board.tile[selectedtileCol][selectedtileRow];
         if (tile.col == board.tile[selectedtileCol][selectedtileRow].col && tile.row == board.tile[selectedtileCol][selectedtileRow].row && selectedtileRow >= 0 && selectedtileCol >= 0) {
 
             // Create a solid color brush for the dots
             ID2D1SolidColorBrush* dotBrush = nullptr;
-            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(1.0f, 0.9f, 0), &dotBrush);
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(1, 0.93, 0.53, 1), &dotBrush);
             if (FAILED(hr))
             {
                 // Handle the error if necessary
             }
 
-            // Draw four dots for each point of the tile polygon
-            D2D1_ELLIPSE dotEllipse;
-            float dotRadius = tileSize / 10; // Adjust the dot radius as needed
 
-            // Draw dot for point (x0, y0)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x0, tile.polygon.y0);
-            dotEllipse.radiusX = dotEllipse.radiusY = dotRadius;
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x1, y1)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x1, tile.polygon.y1);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x2, y2)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x2, tile.polygon.y2);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
-
-            // Draw dot for point (x3, y3)
-            dotEllipse.point = D2D1::Point2F(tile.polygon.x3, tile.polygon.y3);
-            renderTarget->FillEllipse(dotEllipse, dotBrush);
+            renderTarget->FillRectangle(D2D1::RectF(tile.polygon.x0, tile.polygon.y0, tile.polygon.x0 + tileSize, tile.polygon.y0 + tileSize), dotBrush);
 
             // Release the dot brush after use
             dotBrush->Release();
             dotBrush = nullptr;
         }
-
 
         //pieces
         for (int row = 0; row < board.GetRows(); row++)
@@ -610,6 +558,32 @@ void Window32app::RenderBoard()
             int dragCol = draggablePiece->col - (tileSize / 2);
             D2D1_RECT_F destRect = D2D1::RectF(dragRow, dragCol, dragRow + tileSize, dragCol + tileSize);
             renderTarget->DrawBitmap(draggablePiece->bitmap, destRect);
+        }
+
+        //valid tiles render.
+        for (const ChessTile& tile : validTiles) {
+            // Calculate the center of the tile
+            int col = tile.col;
+            int y = tile.row;
+            ChessTile tileOnBoard = board.tile[col][y];
+            float centerX = (tileOnBoard.polygon.x0 + tileOnBoard.polygon.x1 + tileOnBoard.polygon.x2 + tileOnBoard.polygon.x3) / 4.0f;
+            float centerY = (tileOnBoard.polygon.y0 + tileOnBoard.polygon.y1 + tileOnBoard.polygon.y2 + tileOnBoard.polygon.y3) / 4.0f;
+
+            // Create the ellipse centered at the tile's center
+            ID2D1SolidColorBrush* test = nullptr;
+            HRESULT hr = renderTarget->CreateSolidColorBrush(D2D1::ColorF(0.250f, 1.0f, 0.25f, 0.5f), &test);
+            D2D1_ELLIPSE dec;
+            float dotRadius = tileSize / 8; // Adjust the dot radius as needed (smaller value for smaller dots)
+
+            dec.point = D2D1::Point2F(centerX, centerY);
+            dec.radiusX = dec.radiusY = dotRadius;
+
+            // Draw the ellipse on the valid tile
+            renderTarget->FillEllipse(dec, test);
+
+            // Release the dot brush after use
+            test->Release();
+            test = nullptr;
         }
 
     // End drawing
@@ -653,4 +627,17 @@ void Window32app::LoadTexture(std::wstring textureName, ID2D1Bitmap** ppBitmap)
         std::wstring fal = L"(" + textureName + L" ) failed! \n";
         OutputDebugStringW(fal.c_str());
     }
+}
+
+void Window32app::AddPieceToBoard(int m_col, int m_row, TileTeam m_team, TileType m_type, ID2D1Bitmap* m_bitmap) {
+
+    ChessPiece* newPiece = new ChessPiece;
+
+    newPiece->team = m_team;
+    newPiece->type = m_type;
+    newPiece->bitmap = m_bitmap;
+    newPiece->col = m_col;
+    newPiece->row = m_row;
+
+    board.tile[newPiece->col][newPiece->row].piece = newPiece;
 }

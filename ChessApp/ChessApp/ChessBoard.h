@@ -87,6 +87,12 @@ public:
 
     static ID2D1Bitmap* pKnightBitmap_w;
     static ID2D1Bitmap* pKnightBitmap_b;
+
+    static ID2D1Bitmap* pRookBitmap_w;
+    static ID2D1Bitmap* pRookBitmap_b;
+
+    static ID2D1Bitmap* pBishopBitmap_w;
+    static ID2D1Bitmap* pBishopBitmap_b;
 };
 
 
@@ -100,41 +106,48 @@ std::vector<ChessTile> getValidPawnMove(const ChessTile& currentTile, ChessBoard
 {
     validTiles.clear();
 
-    if (currentTile.piece->team == TileTeam::WHITE) {
-        OutputDebugString(L"Calculating valid moves for white pawn....\n");
+    //for white
+    int directionRow[] = { 1, 1, 1 };
+    int directionCol[] = { 0, 1, -1 };
 
-        std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
-            L" Y: " + std::to_wstring(currentTile.row) + L"\n";
-        OutputDebugString(str.c_str());
+    if (currentTile.piece->team == TileTeam::BLACK) {
+        directionRow[0] = { -1 };
+        directionRow[1] = { -1 };
+        directionRow[2] = { -1 };
 
-        // Check if the destination tile is within the board bounds and is empty (NONE)
-        if (currentTile.row + 1 < 8 && !b1.tile[currentTile.col][currentTile.row + 1].piece) {
-            // Add the valid move to the list of valid tiles
-            validTiles.push_back(b1.tile[currentTile.col][currentTile.row + 1]);
-        }
-
-        if (currentTile.row == 1 && currentTile.row < 8) 
-        {
-            if (currentTile.row + 2 < 8 && !b1.tile[currentTile.col][currentTile.row + 2].piece) {
-                // Add the valid move to the list of valid tiles
-                validTiles.push_back(b1.tile[currentTile.col][currentTile.row + 2]);
-            }
-        }
-
-        if (currentTile.row + 1 < 8 && currentTile.col + 1 < 8 && b1.tile[currentTile.col + 1][currentTile.row + 1].piece) {
-            if(b1.tile[currentTile.col + 1][currentTile.row + 1].piece->team == TileTeam::BLACK)
-                validTiles.push_back(b1.tile[currentTile.col + 1][currentTile.row + 1]);
-        }
+        directionCol[0] = { 0 };
+        directionCol[1] = { -1 };
+        directionCol[2] = { 1 };
     }
 
+    OutputDebugString(L"Calculating valid moves for white pawn....\n");
+    std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
+        L" Y: " + std::to_wstring(currentTile.row) + L"\n";
 
-    for (size_t i = 0; i < validTiles.size(); i++)
+    OutputDebugString(str.c_str());
+
+    //forwards
+    for (size_t i = 0; i < 1; i++)
     {
-        const ChessTile tile = validTiles[i];
-        std::wstring str = L"Valid move: X: " + std::to_wstring(tile.col) +
-            L" Y: " + std::to_wstring(tile.row) + L"\n";
-        OutputDebugString(str.c_str());
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
+
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }
     }
+
+    for (size_t i = 1; i < 3; i++)
+    {
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
+
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team != currentTile.piece->team) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }
+    }
+
+    
 
     return validTiles;
 }
@@ -146,24 +159,24 @@ std::vector<ChessTile> getValidKnightMove(const ChessTile& currentTile, ChessBoa
     int directionRow[] = { 2, 1, -1, -2, -2, -1, 1, 2 };
     int directionCol[] = { 1, 2, 2, 1, -1, -2, -2, -1 };
 
-    if (currentTile.piece->team == TileTeam::WHITE) 
+    OutputDebugString(L"Calculating valid moves for white knight....\n");
+    std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
+        L" Y: " + std::to_wstring(currentTile.row) + L"\n";
+
+    OutputDebugString(str.c_str());
+
+    for (size_t i = 0; i < 8; i++)
     {
-        OutputDebugString(L"Calculating valid moves for white knight....\n");
-        std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
-            L" Y: " + std::to_wstring(currentTile.row) + L"\n";
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
 
-        OutputDebugString(str.c_str());
-
-        for (size_t i = 0; i < 8; i++)
-        {
-            int destRow = currentTile.row + directionRow[i];
-            int destCol = currentTile.col + directionCol[i];
-
-            if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
-                validTiles.push_back(b1.tile[destCol][destRow]);
-            }
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team != currentTile.piece->team) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
         }
     }
+    
     return validTiles;
 }
 
@@ -172,26 +185,81 @@ std::vector<ChessTile> getValidRookMove(const ChessTile& currentTile, ChessBoard
 {
     validTiles.clear();
 
-    int directionRow[] = { -1, 1, 0, 0 };
-    int directionCol[] = { 0, 0, -1, 1 };
+    int directionRow[] = { 1, 2, 3, 4, 5, 6, 7, -1, -2, -3, -4, -5, -6, -7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    int directionCol[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 3, 4, 5, 6, 7, -1, -2, -3, -4, -5, -6, -7 };
 
-    if (currentTile.piece->team == TileTeam::WHITE)
+    OutputDebugString(L"Calculating valid moves for white rook....\n");
+    std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
+        L" Y: " + std::to_wstring(currentTile.row) + L"\n";
+
+    for (size_t i = 0; i < 7; i++)
     {
-        OutputDebugString(L"Calculating valid moves for white rook....\n");
-        std::wstring str = L"This tile is at: X: " + std::to_wstring(currentTile.col) +
-            L" Y: " + std::to_wstring(currentTile.row) + L"\n";
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
 
-
-        for (size_t i = 0; i < 4; i++)
-        {
-            int destRow = currentTile.row + directionRow[i];
-            int destCol = currentTile.col + directionCol[i];
-
-            if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
-                validTiles.push_back(b1.tile[destCol][destRow]);
-            }
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team == currentTile.piece->team) {
+            break;
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team != currentTile.piece->team) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+            break;
         }
     }
+
+    for (size_t i = 7; i < 14; i++)
+    {
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
+
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team == currentTile.piece->team) {
+            break;
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team != currentTile.piece->team) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+            break;
+        }
+    }
+        
+    for (size_t i = 14; i < 21; i++)
+    {
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
+
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team == currentTile.piece->team) {
+            break;
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team != currentTile.piece->team) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+            break;
+        }
+    }
+
+    for (size_t i = 21; i < 28; i++)
+    {
+        int destRow = currentTile.row + directionRow[i];
+        int destCol = currentTile.col + directionCol[i];
+
+        if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && !b1.tile[destCol][destRow].piece) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team == currentTile.piece->team) {
+            break;
+        }
+        else if (destRow >= 0 && destRow <= 7 && destCol >= 0 && destCol <= 7 && b1.tile[destCol][destRow].piece && b1.tile[destCol][destRow].piece->team != currentTile.piece->team) {
+            validTiles.push_back(b1.tile[destCol][destRow]);
+            break;
+        }
+    }
+    
 
     return validTiles;
 }
